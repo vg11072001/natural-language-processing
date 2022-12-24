@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)http://jalammar.github.io/illustrated-transformer/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time.</title>
+
+        
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    
+    <meta name="description" content="Discussions:
+Hacker News (65 points, 4 comments), Reddit r/MachineLearning (29 points, 3 comments)
+
+
+Translations: Arabic, Chinese (Simplified) 1, Chinese (Simplified) 2, French 1, French 2, Japanese, Korean, Persian, Russian, Spanish, Vietnamese
+
+Watch: MIT’s Deep Learning State of the Art lecture referencing this post
+
+In the previous post, we looked at Attention – a ubiquitous method in modern deep learning models. Attention is a concept that helped improve the performance of neural machine translation applications. In this post, we will look at The Transformer – a model that uses attention to boost the speed with which these models can be trained. The Transformer outperforms the Google Neural Machine Translation model in specific tasks. The biggest benefit, however, comes from how The Transformer lends itself to parallelization. It is in fact Google Cloud’s recommendation to use The Transformer as a reference model to use their Cloud TPU offering. So let’s try to break the model apart and look at how it functions.
+
+The Transformer was proposed in the paper Attention is All You Need. A TensorFlow implementation of it is available as a part of the Tensor2Tensor package. Harvard’s NLP group created a guide annotating the paper with PyTorch implementation. In this post, we will attempt to oversimplify things a bit and introduce the concepts one by one to hopefully make it easier to understand to people without in-depth knowledge of the subject matter.
+
+2020 Update: I’ve created a “Narrated Transformer” video which is a gentler approach to the topic:
+
+
+
+
+A High-Level Look
+Let’s begin by looking at the model as a single black box. In a machine translation application, it would take a sentence in one language, and output its translation in another.
+
+
+  
+
+
+">
+    <meta property="og:description" content="Discussions:
+Hacker News (65 points, 4 comments), Reddit r/MachineLearning (29 points, 3 comments)
+
+
+Translations: Arabic, Chinese (Simplified) 1, Chinese (Simplified) 2, French 1, French 2, Japanese, Korean, Persian, Russian, Spanish, Vietnamese
+
+Watch: MIT’s Deep Learning State of the Art lecture referencing this post
+
+In the previous post, we looked at Attention – a ubiquitous method in modern deep learning models. Attention is a concept that helped improve the performance of neural machine translation applications. In this post, we will look at The Transformer – a model that uses attention to boost the speed with which these models can be trained. The Transformer outperforms the Google Neural Machine Translation model in specific tasks. The biggest benefit, however, comes from how The Transformer lends itself to parallelization. It is in fact Google Cloud’s recommendation to use The Transformer as a reference model to use their Cloud TPU offering. So let’s try to break the model apart and look at how it functions.
+
+The Transformer was proposed in the paper Attention is All You Need. A TensorFlow implementation of it is available as a part of the Tensor2Tensor package. Harvard’s NLP group created a guide annotating the paper with PyTorch implementation. In this post, we will attempt to oversimplify things a bit and introduce the concepts one by one to hopefully make it easier to understand to people without in-depth knowledge of the subject matter.
+
+2020 Update: I’ve created a “Narrated Transformer” video which is a gentler approach to the topic:
+
+
+
+
+A High-Level Look
+Let’s begin by looking at the model as a single black box. In a machine translation application, it would take a sentence in one language, and output its translation in another.
+
+
+  
+
+
+">
+    
+    <meta name="author" content="Jay Alammar">
+
+    
+    <meta property="og:title" content="The Illustrated Transformer">
+    <meta property="twitter:title" content="The Illustrated Transformer">
+    
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script async="" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/analytics.js.download"></script><script src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/jquery-3.1.1.slim.min.js.download"></script>
+    <script type="text/javascript" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/d3.min.js.download"></script>
+    <script type="text/javascript" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/d3-selection-multi.v0.4.min.js.download"></script>
+    <script type="text/javascript" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/d3-jetpack.js.download"></script>
+
+    <link rel="stylesheet" href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/bootstrap.min.css">
+    <link rel="stylesheet" href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/bootstrap-theme.min.css">
+    <script src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/bootstrap.min.js.download"> </script>
+
+    <link rel="stylesheet" type="text/css" href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/gifplayer.css">
+    <script type="text/javascript" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/jquery.gifplayer.js.download"></script>
+
+    <!--
+    <script data-main="scripts/main" src="scripts/require.js"></script>
+    -->
+    <link rel="stylesheet" href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/katex.min.css" integrity="sha384-wE+lCONuEo/QSfLb4AfrSk7HjWJtc4Xc1OiB2/aDBzHzjnlBP4SX7vjErTcwlA8C" crossorigin="anonymous">
+    <script src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/katex.min.js.download" integrity="sha384-tdtuPw3yx/rnUGmnLNWXtfjb9fpmwexsd+lr6HUYnUY4B7JhB5Ty7a1mYd+kto/s" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/style.css">
+    <link rel="alternate" type="application/rss+xml" title="Jay Alammar - Visualizing machine learning one concept at a time." href="http://jalammar.github.io/feed.xml">
+
+    <meta name="viewport" content="width=device-width">
+    <!-- Created with Jekyll Now - http://github.com/barryclark/jekyll-now -->
+
+    <!-- Piwik -->
+    <!-- Piwik
+    <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(["setDomains", ["*.example.org"]]);
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u="https://a.jalammar.com/";
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['setSiteId', '1']);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>
+    <noscript><p><img src="https://a.jalammar.com/piwik.php?idsite=1" style="border:0;" alt="" /></p></noscript>-->
+    <!-- End Piwik Code -->
+
+    <!-- End Piwik Code -->
+  <style data-styled="active" data-styled-version="5.3.3">.eUHcVO{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-flex:1;-ms-flex:1;flex:1;min-height:0;}.pFGce{width:100%;height:100%;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}.hclxbU{display:inline-block;position:relative;width:80px;height:80px;}.hclxbU div{position:absolute;width:16px;height:16px;border-radius:50%;background:#DA3832;-webkit-animation:lds-grid 1.2s linear infinite;animation:lds-grid 1.2s linear infinite;}.hclxbU div:nth-child(1){top:8px;left:8px;-webkit-animation-delay:0s;animation-delay:0s;}.hclxbU div:nth-child(2){top:8px;left:32px;-webkit-animation-delay:-0.4s;animation-delay:-0.4s;}.hclxbU div:nth-child(3){top:8px;left:56px;-webkit-animation-delay:-0.8s;animation-delay:-0.8s;}.hclxbU div:nth-child(4){top:32px;left:8px;-webkit-animation-delay:-0.4s;animation-delay:-0.4s;}.hclxbU div:nth-child(5){top:32px;left:32px;-webkit-animation-delay:-0.8s;animation-delay:-0.8s;}.hclxbU div:nth-child(6){top:32px;left:56px;-webkit-animation-delay:-1.2s;animation-delay:-1.2s;}.hclxbU div:nth-child(7){top:56px;left:8px;-webkit-animation-delay:-0.8s;animation-delay:-0.8s;}.hclxbU div:nth-child(8){top:56px;left:32px;-webkit-animation-delay:-1.2s;animation-delay:-1.2s;}.hclxbU div:nth-child(9){top:56px;left:56px;-webkit-animation-delay:-1.6s;animation-delay:-1.6s;}@-webkit-keyframes lds-grid{0%,100%{opacity:1;}50%{opacity:0.5;}}@keyframes lds-grid{0%,100%{opacity:1;}50%{opacity:0.5;}}.blwkrT{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;border-radius:6px;border:none;outline:none;height:40px;line-height:inherit;font-size:14px;font-weight:500;padding:0 10px;width:auto;cursor:pointer;-webkit-transition-property:background-color,color,opacity;transition-property:background-color,color,opacity;-webkit-transition-duration:0.2s;transition-duration:0.2s;white-space:nowrap;background-color:#000000;color:#FFFFFF;}.blwkrT:hover,.blwkrT:active,.blwkrT:focus{background-color:#DA3832;}.kgtBlH{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;border-radius:6px;border:none;outline:none;height:40px;line-height:inherit;font-size:14px;font-weight:500;padding:0 10px;width:auto;cursor:pointer;-webkit-transition-property:background-color,color,opacity;transition-property:background-color,color,opacity;-webkit-transition-duration:0.2s;transition-duration:0.2s;white-space:nowrap;background-color:rgba(0,0,0,0.1);color:#000000;}.kgtBlH:hover,.kgtBlH:active,.kgtBlH:focus{background-color:rgba(0,0,0,0.2);}.idcWUa{width:24px;height:24px;-webkit-mask-image:url(chrome-extension://hbklahkfbghjgbclbfcnhpfmajkagnci/icons/close.svg);mask-image:url(chrome-extension://hbklahkfbghjgbclbfcnhpfmajkagnci/icons/close.svg);-webkit-mask-position:center center;mask-position:center center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:cover;mask-size:cover;background-color:#8C8B8A;-webkit-flex-shrink:0;-ms-flex-negative:0;flex-shrink:0;cursor:pointer;}.indTSF{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;cursor:default;}.dmbedZ{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;cursor:pointer;}.fmghtm{width:20px;height:20px;background-image:url(chrome-extension://hbklahkfbghjgbclbfcnhpfmajkagnci/icons/48x48_red.png);background-position:center center;background-repeat:no-repeat;background-size:cover;}.ftYOKN{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}.fPYnWN{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;}.JRoxh{padding:0px;height:-webkit-fit-content;height:-moz-fit-content;height:fit-content;background:#fcfcfc;margin-bottom:-2px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;position:relative;z-index:100;border-top-left-radius:10px;border-top-right-radius:10px;cursor:move;}.jaMNJO{margin-left:4px;width:18px;height:18px;cursor:pointer;}.bnfxPj{position:absolute;top:50%;right:10px;-webkit-transform:translateY(-50%);-ms-transform:translateY(-50%);transform:translateY(-50%);display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}.dIuWHJ{display:none;position:fixed;z-index:99999;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,0.4);}.kZcOAB{background-color:#fefefe;padding:20px;border:1px solid #888888;width:360px;position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-animation-name:animatetop;animation-name:animatetop;-webkit-animation-duration:0.4s;animation-duration:0.4s;border-radius:12px;}@media (max-width:812px){.kZcOAB{width:85% !important;}}.kZcOAB > div:not(:last-child){margin-bottom:30px;}.bJwUBx{padding:0;}.fOGVrh{margin:0;font-weight:600;font-size:20px;line-height:26px;color:#000000;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}.jgEzBl{position:absolute;top:10px;right:10px;}.eWgdsE{padding:0;}.cximxh{padding:0;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;gap:5px;}.fOCdIe{width:40px;display:inline-block;}.befcyA{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;min-height:0;border-radius:10px;}.dWlwqe{margin:auto;}</style><style type="text/css">#mc_embed_signup input.mce_inline_error { border-color:#6B0505; } #mc_embed_signup div.mce_inline_error { margin: 0 0 1em 0; padding: 5px 10px; background-color:#6B0505; font-weight: bold; z-index: 1; color:#fff; }</style><style>@font-face {
+	font-family: "wticons";
+	src: url("data:font/woff2;charset=utf-8;base64,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") format("woff2");
+}
+
+.wticons {
+	line-height: 1;
+}
+
+.wticons:before {
+	font-family: wticons !important;
+	font-style: normal;
+	font-weight: normal !important;
+	vertical-align: top;
+}
+
+.wticon-account:before {
+	content: "\f101";
+}
+.wticon-add:before {
+	content: "\f102";
+}
+.wticon-cardResizeDrag:before {
+	content: "\f103";
+}
+.wticon-casual:before {
+	content: "\f104";
+}
+.wticon-check:before {
+	content: "\f105";
+}
+.wticon-checkSmall:before {
+	content: "\f106";
+}
+.wticon-chevron:before {
+	content: "\f107";
+}
+.wticon-copy:before {
+	content: "\f108";
+}
+.wticon-copySmall:before {
+	content: "\f109";
+}
+.wticon-dismiss:before {
+	content: "\f10a";
+}
+.wticon-downChevron:before {
+	content: "\f10b";
+}
+.wticon-error:before {
+	content: "\f10c";
+}
+.wticon-expand:before {
+	content: "\f10d";
+}
+.wticon-feedback:before {
+	content: "\f10e";
+}
+.wticon-filledDownArrow:before {
+	content: "\f10f";
+}
+.wticon-find:before {
+	content: "\f110";
+}
+.wticon-formal:before {
+	content: "\f111";
+}
+.wticon-gift:before {
+	content: "\f112";
+}
+.wticon-grayLogo:before {
+	content: "\f113";
+}
+.wticon-ignore:before {
+	content: "\f114";
+}
+.wticon-info:before {
+	content: "\f115";
+}
+.wticon-leftChevron:before {
+	content: "\f116";
+}
+.wticon-logo:before {
+	content: "\f117";
+}
+.wticon-love:before {
+	content: "\f118";
+}
+.wticon-noRecommendations:before {
+	content: "\f119";
+}
+.wticon-paragraphRewrite:before {
+	content: "\f11a";
+}
+.wticon-paste:before {
+	content: "\f11b";
+}
+.wticon-pin:before {
+	content: "\f11c";
+}
+.wticon-premium:before {
+	content: "\f11d";
+}
+.wticon-premiumDetail:before {
+	content: "\f11e";
+}
+.wticon-premiumFull:before {
+	content: "\f11f";
+}
+.wticon-recommendationLight:before {
+	content: "\f120";
+}
+.wticon-recommendationLightCard:before {
+	content: "\f121";
+}
+.wticon-recommendationLightNoSuggestions:before {
+	content: "\f122";
+}
+.wticon-refine:before {
+	content: "\f123";
+}
+.wticon-rewrite:before {
+	content: "\f124";
+}
+.wticon-rightChevron:before {
+	content: "\f125";
+}
+.wticon-rocket:before {
+	content: "\f126";
+}
+.wticon-sentenceExamples:before {
+	content: "\f127";
+}
+.wticon-settings:before {
+	content: "\f128";
+}
+.wticon-shorten:before {
+	content: "\f129";
+}
+.wticon-tutorial:before {
+	content: "\f12a";
+}
+.wticon-unlock:before {
+	content: "\f12b";
+}
+.wticon-warn:before {
+	content: "\f12c";
+}
+.wticon-WordtuneButton:before {
+	content: "\f12d";
+}
+.wticon-x:before {
+	content: "\f12e";
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9zcmMvc2hhcmVkL0ljb25zLmZvbnQuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Q0FDQyxzQkFBc0I7Q0FDdEIsNjNTQUE2M1M7QUFDOTNTOztBQUVBO0NBQ0MsY0FBYztBQUNmOztBQUVBO0NBQ0MsK0JBQStCO0NBQy9CLGtCQUFrQjtDQUNsQiw4QkFBOEI7Q0FDOUIsbUJBQW1CO0FBQ3BCOztBQUVBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCO0FBQ0E7Q0FDQyxnQkFBZ0I7QUFDakI7QUFDQTtDQUNDLGdCQUFnQjtBQUNqQjtBQUNBO0NBQ0MsZ0JBQWdCO0FBQ2pCIiwic291cmNlc0NvbnRlbnQiOlsiQGZvbnQtZmFjZSB7XG5cdGZvbnQtZmFtaWx5OiBcInd0aWNvbnNcIjtcblx0c3JjOiB1cmwoXCJkYXRhOmZvbnQvd29mZjI7Y2hhcnNldD11dGYtODtiYXNlNjQsZDA5R01nQUJBQUFBQUJ2c0FBc0FBQUFBUVdRQUFCdVpBQUVBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUhJa1lCbFlBakJBSzJ3akpKUUUyQWlRRGduQUxnVG9BQkNBRmhBb0hobWtiL3paVkliQnhBSkF3blJKUmxLeE5TUGIvbHdSdFNxZ3NIdEoyTDJqR3JDRGJLWHNSaVRUNlZLUkYwSWQyR2ZrS0hxTjkxVVdhTVRSYVhGdC85UlVxeUYxUHlTL3ZxRy9jVUVwNC9wbXI5d1lHbHBBU25pVERXQ0JXZTc2dUZJQkNWdGxYSUFDdWVaL2k3NHNDcWFaWjRlalI1aW44Z01NMVRUOEFobWliQjArWTBJb05Jb0lWSUFJU0VqWkttY0dpYkZ3YXhTck1yVjJwbTR2V1pUdHhsUzdhaFM2U283VTJ0bnBpZXkvaVJEeFR5Wjh5TVJLYXRrYklIZ0dEODBJZWNSQ0RPVFdwT1pTY1lhQTA0TkNBV1ZDRWpaL2tBK3Z1SjkzOUhLY0VhUnNhTUJ2MmwrcHZPLzE3K25DeFcvZlkyeGpqVEVBUUdwQjRRc1JORVRhMU9hNVRPbGw5S2dpRHpiZldyOTdlVjBOTUxwSEZ2QlRTN054OS9zN083UmZmSGN6dUw3Ym9IU2FXUk93RWMyODhraVdUMXozVElkRXNVZ3FsV0szUWlNQkQzS3VhTWUwSFBNOGVZa2pHbkpaWVd1cUZZZzNXNmlYcWxSWk5JSzBZVjdmYVRkK0JtN2tpcEoreDJlK0IwN3UyR3BreUxFVE01ZjNjRVJRdzdKSkRIYVNMVGNiejE3LzZoR1U2czE4RlNkMUsvdjY3cjVNMC9PZ2x6b3JrV1J3Znc2UjlvYi81S1ZiS0pxNVVJZTNWSHJwSTc5aVZUN3hmTEZERnpWTWxtRXdXbThPbDBYZzhDWlBPaGJyZTg0MFhzWEVHWDM4UlV3S2hTRm9ndzJmSVNocVdGekFWRkpVWWNuTEdETEZVVkVreUxNR2tXK2F6T09LV2FBalpaYVVTWWsyVUdLRno2aXAwZCtJY0ExdDBTSWlicGxpQ0FDemZVbElTY0hnTXJxaFpITEx3dDVLZnRib3N2cWlEbTFmRnJac3d3bExqcUFzVGZWeENoRXNlRHBWd3A5YTl1QlhjK1ZHeDJaMm1MWkw5ak83cXNuaGIxdW83RUFvMDZDY1d1TG02c2dmOXlBeHIzeGRHK1pxUmh6b25nWnIwMFYyQnM0VUhHaUtPd0tXNFNrbkFWWXlwV2RQaW5sUVlIWW1UWXZ4UDB6NU4wakhMbFVreHNPdFJwcW1lSjRhU2lweTA1RnF5TWV4MklXYUZibWEraE1YblVIVkRMWk1zaDJZcXNFTG5hTEJLeEVWTGtpdHMrVlZ0bGl6TElsMmtzVkliVE5wMGJOV0lMTTJWR2Erdkg4aU9ONkwxS3d2RWpidFU5SmF2UEdjbUZVd01XWTlVNU5kVFUyb2krOFpFYXJBa1lpdkp5RU1aSStjY0dxR1REbnVGVTN2TjBNaU9HTlRxQ3V6U1ZGR3JRbmRQNzFoMDZJWVZDa0JtVFRSYlowN0FrMW1mWEV2MTRXcG00SUJPbW93WncvTnp4L243Qzg4cEJ1S0VGYnBINDhUajdtNFNHT3dFYUJDSElqbG43bnZzaVdzZDJyR3NuSXFhaGo0bC9IOFpKQmlMMWQ4QVB3WTNYdmxBTXdoQkZZc3dONk42aU43aUw3cWxQLzhCL2VqdGRXdkJBREdnZ2ROcm1yL2FvWlpUYXFCRjRpbk44TWYrMFFNVm1EVkpvMHNyS212b2VOOW5maWo5Ly8veGRhcWU4T3MrOUVVSmE2NHBLbWF0VzlUbS9ybGt5SU9XZ2JxTW5vNjJycFNpUGtPVHlWdFRLS3NyUkFweVNrUkxoVCtUcG0xbE5VK3EwaFRCM21HT1NVZ2FNbUxVdUFtVHBzeVlOV2ZlZ2lYTFZxeGFzMkhUbG0yNzl1dzdjT1RZcVRQbkxseTZjdTNHclR2M0hqeEJTVEZOdERiMVRLOERNRVFKcEJid1dnenBHR3UrSjIxazgvRFBQeTA1VmdYNEE5Y3VxNTZxQ3FET1VZRDJnS28xNER0VHRFQ0tBUWlvZzVBTWlPaUJOQjFRcEEzSzdTNXZBVWlCUnJ2SVhnRDY0SFVNOEFaTjhDWW1lQXNQdkUwQTNxRUIzaVVMM2lNUDNpY0NIMUlBSDVFREgxTUNuK0NBVDdIQVoxVEFGL2pnUzBMd0ZTNzRHaHQ4UXhsOFN3MTh4eFA0bmlyNEladUdZSU9nUlFBYUJIUUl4Q0FpQWRFaUNURmlDR0xGQ01TSlVZZ1g0NUJJVEVCaU1RbEp4QlFrRlRPUVRNeENjakVIS2NROHBCUUxrRW9zUVlKWWh0UmlCZElRcTVDbVdJTzB4QWFrTFRZaEhiRUY2WXB0U0Uvc1F2cGlEeklRKzVDaE9JQ014QkZrTEk0aEUzRUttWW96eUV5Y1ErYmlBcklRbDVDbHVJS3N4RFZrTFc0Z0czRUwyWW83eUU3Y1EvYmlBWElvcnAwbHZPUjk4Qk4rTTM0RTRlVXptQ01zZ3VLVDZaRVJzZUpZSWd2UlhCQnFLalFuQnBZcHhkUm15QWhiWUNpeE5TbGI0Q3c0YlVXNzVnYnYyMXpVdmNRK2kydVJvV2puMURWYXVWeFFQOWJVV2QzdjhSZHA2cDNuVVQxWStWbFJHV090LzNiemc1UFNGWTBrYnJiYnhucFZPWC9HWGpkZnhIN05qanExbGp3UElSMkdJTlZ4d1RIclhmc0F2YVp3NGZzQ0c5OHU4Y0wzQTN4Q1IxSGxxMjczWVorNDNpZ1NQYXAzM3Z6UTlpRWVJTG9rTmdPRE9vSGlYaUNZKzMrdE5yZm0vb3JicjVmZFhIVTNjdG1GZ3I4NDZDbjZhYk1EREx0SjNQaWlQajB6bm42VW42OXozaUVBQVF3d3hFMEVHd3o2YkQ4OS9XWHJIK0RuQjF4SlBtNnlmLzBiL1BYblgvQnZ2WWtKMkpaRE1oMHdPd0RvNWtPZ0d0ZmU0WW5LODZCd0NVR2NCZWVzYmtHbkowZ0x3b2tGbS9ta25SMmk3VWNtdE00YlRrWW9pZklYZFQvUWlwQlBQR25VWkEwZlBNSis5UVQ2eE9NS3plZlh5YWV3ejA5UDVON2k5Mm56YzBkSWE3ZkpZVTZQc25QeEE5NDhLaGNqMWVEZmVlZXFjVVF1Um1tbnk3a1dueDhhRHZOeDhydjRnZjJzYTUxZmVmTXEyTnBpcGllZG1MVzFwNjVYSGcwT1JNaDQ5YzM0aWpRNkVvODArK0ZaRGtManBBalN1ZlJsaUUva0pkcjhMRkNOREZONWtaTVpJNHVaa2JtZEUzbVZKZmtabmFSY1p5KzRCMlhENEdnVUsrOGd6YXA0U2x3VXNyT3FnRFdBbFV4SGxWTVNDTzRQaGprTmhnK0c1ektPSVlPSWNBUVlBb3QweFBxZXV3aEorMms1UWZMalV3QW1neGdncUFIajJhZUo5dm55UWtUKytlY3pPb1cxVzlxNS9KWFM3cjRROWxNa0hla29EbGlocmxEdXN4c3hlNHFOa3V6Mlc4dXhtbmVuS1Rubkh1MHF2WDUvTGxvNTIvVGNiRVlDbVhKdmJhb3NCWVVWc2hCTXQrQWlKSE93cWxZQmFNMDEveW1nd1VvTWpBeEN2ZzRNbTRHT2NwdDJsblNYOVh2VHVxclJza0loMDJ4RzZaNXltM1E4Wm5GSG9CQUp6c3hPYzIzbWhrSldhTFEwRk1pc21tMEd6UFRvYUM1bm9LdTBxNng3RmkrRDRreHZHU2hrWW4yWkJEVE5rQlh1N3IvU1REaHNVMEZwTXRoWkFscWsvMldDbmNFa0xCdXJ0V1B4Y0todmFwODNyWDloZHpobGNTTnN0T0VEbmtVbzMyTW5BbGtnZU5KbkxPNlpMTHZCUFFiN1NqOHpGeTBEOWgrTi9YL3E0ZHJRYVJEaUFxNUFWYll6cnF3K09sd3N2ZUVwWi9FMVk5RlZXN3BMbmtPLytDNi9HdCtjSCsxa0ZNbEVBWUI4R054WW0xZk4rQ2NFTTZ0dUloYjJPbzlCckpiZml4SngvYjE4ZTNYelM5U0hHODBBN1dXNG8zZ00vS05iQnZhc3Vsc1Y4ZlNHR05Fc1Z2RThQQXNRRkxFY2twRk12V3ZUSGMvUEc4UEtPYTMxZnNMcVE1d1c3T3BxdDFmUytkZkFNK3Y3WEhFUjVmb0d0QTZCOGZEWVJqZWtVZXd2MHFxTHNBODdMYjRDZHJEbHF1Zkg4WFZ4QnFpNm5iVzA4cE96bkp2ZFhsa0thVG5vSzUyV21td2E2dEk4TGMwY3BYbDN4N3RhV296SXZhOFRDV1hhNC9Jck1LN056NjdQSGc2R2Y4U2Z4Sy9jZ09JN2ttOGppUVc1OTBSNEhsYnZvdmtQV0RrT01CS0ZkVlRJSERwMDVIdnM4WUt1TGpQT0VuUVRLMkRoR1VFK294MzIzMlhEL3RmMndocFpoTGJIbXNiL05LNytRaXhUSmdscE1nZEJkcXZPa2lXV0JNMTlaaEp2WDJ3b3lJK21MRUtZWlFZSUlYMG9IYUEzNTlEUmpVSWdMZWRhTFpaNW9oNDE3Qm9mb0JzQzlyTXJFZmR6Z3p6VXQ2VjhVZTNaY21BVlJFMmtsYVJib2VIL1NCVUNtQUUvaEJyd016VVBBd1R4eURzNk44NDFHN1l0WFJlT0k5T2d2cmlIYnpRSUhaSGJJcndUSXYySlpYbkFzSmZaWkpMTGJydFF2UGhDQ0lYSXBWdlYwTjYwM09WUDMxN25xRjRJenVmaHhOM0lvQWt5VjgrN0grRHg2bDZRWnUxSVM4YU90ZVdHZERWYkJkdXQ3cjBLQ1hUYmtrR3E1aWhhVW9WbkhYeWVub1h0K2VFWXMwYlJPSGt6UURwS09rdUNyVmxWWDhSWjhhS2FqU3pHS2c4aHFyL2ZsbnkySHhUUVZ4dlZ2VmlqWTRET0FOT3VoVUpDRDdIVC9EQ3BnYWdTcWhzMytEQ0hkOTF5NkRrUjRIdFhmV1c4U3ZqbWJKL3JqNityMzQrSFY4R3pzeDNVMGpwNmJWMjVLZ1N1ZWJ6ZytZZHlJelc2cVhDT01Dc2RxRkNteTFpNG1tMVhjUE5XZUllcVp5THdkQU5mY25qSDJraHJDejBwVjkxZGwwbDQxTnRhK1NEK1pPRVYrSEdYUTA2T2JuOUNxUGNpUWxGSzVHTVBMUjNiUWhxSlBWeVZtZDBkdjdJeFZvWFhwVDBNM3RudEpEV2FuU1BoSnh0L0FIRmpJRjEzZlBFTzZFWXhUU1lEeEVReXhES3ppV0VpSkswUXV4M0xJNnZuTzlBbHlwaGxoWGtLcXlETnorT3BGTVlxQ1ZxM29vQ1N3OXpiblVTRXB2SUZaRTF1N2dxR3lMSjBaQlZMMFBJT28yUUttYzlYWitjc3A1aXZISXV2cFF2WnRHN1dHNG5oT01yejJsOEhZanhTVDhSaitWQnZNV2ViTWpTYWUzSTAweXpIcjlrRmplZUhoeDYvZmhsb2FVM09TV0kxTHpWdjdMZjB1V3k4K2dIRjVmZDZBd1dOelpEZkJRMGp3bmdsWVpEeWN3ZytuWVVnYVFPOC82VUFKRE5BbldYS1AyQ2Z5TjB2NStrYWlFRVZ3UER4eHp6V25yVG1FQzVya2ZiUnBkQzNESVJDc3JiMVgzNzB2NW1vdytvY1ZZRFN6MDhab0RvdTRGRXIvVlFCeDRrMXIwWk5HUmIvMU8rZThGTThQS1hMUlJjUXp4QW5qb3NaN2JFVzQ0a01jWHlBaTY3c0llMUhUV1FOV29yMlB1c2ZvTlpxdFgyTEZpbFFkM2g5SCsyMloyb0diNGhHQUw1YzBFSHcwZFE3MEhCL09nekt6S1FDY09rYVFzS2tkYXhxczc2NExmUTRmZHoxakpBYUdqMHJLbXBXZEZyK3dvdk8vZjN6SGp5NGtIaVY4OXdLcXE3ZUVZbzBJSk1lUkd0Q3VMZWtUcjFqeDVFM2I4YkdPa0JsK3FKRm53WUdWcXo4RDd5cVJndUwyTTlvUTBPOGRQeEtkalkvdTUzWDdvQy9WaTZoNENraFM5R1lqcjZiN0ljazdSTEFMR05uVS9BTzdieU83QlJlYVJHbm1pUWRPaDl2Tmo5NTh2U0pBYXlmR2tERjMvejBLZGhiZTl5bTU5Y2dnN0dXeVJINGZRcm9GWk5pWXRabXhnMHVscncvM2J4bnI5bGtzdkx1MUhSNGgxcWY5K3o1N09Oa1BocUtBOGFIcFZqRzV2UUIzYU5tSHlld2NTTjR4QksrUTEzak0vNnhHemRoQWIraDB4bHFvSXZSUmJadzRUdWZLVzBEb2tNWDVQSVdqQXp6N2lEekRjbFpRZXBoV29xOXhESi9ZbTl1UDdOY3o1Q0VHRWladlNSQVZ3eWFXd3lFVHd2N0I0N1lSem9vb2l2NFJlRUZlZUY2d2FjaWZqNlhtODhycXFySUxRM1B6K1BwK1laNG8vL2MvbjUzVDhJamIwN2VyVFNmT08vb2FPODRuNzBDOXZhTzN1M2YrN3BINWhmTllhaG1KT3Nha3BOalp5UlZGdWxtNit4VWsrbzlVR2lDRkkyYTQ0TnNTV21kSmFQUmk0RTgrTkpwbTNrVEJtVjA1a1htN1QwNFlhM0xhWTh6QW8vQzNZWDNVajVudjM3bklUampzUldqM3VqcXFDdkJsT0pPNFVveHRpVytvT3R1cmhFQis5WGRJbnNoOEQxdG5pWEZOeWtpMnFKQlIvOTd1UDJaWlA3RTNGbFVVMWxTeEJUTG1Xb0wzY29QQ3dKaHVLT0ZSUlk0UW5DTDg1SVpqU3JzMU4rNUdWYm9ITmxsUEFoYzNQYVJOVUMrU3VaZHc1THZlMWcxdTcrRjBtcldIbUQ1NFR2NnpBWllyZjN1SUxZdnFINWZqbzJ5a1NzS0RuVGZJTWJTQ0RCL0N0OGpCRmVRdXdTT3BzZFphVW5SbDAvRmJWKzFOR3J4MEVlY1kwTFJ0dnJUWjg2MStIN3RBLytEdWZ0TE54WHVidE5NVGZOTmNvQ1FMa21XOFU1b0lvOGhRNmxVQlljZTlReWlXZ0V4bDZhMkt4eVNEVDc3VTM3KzVjbmkwakp0KzdReVN5dWtSWEtDTFFsTEVOaW5WZFNoSElJSHUzdGp2ODJhQU5NYWR4QU9QdTVzdmZlbDFuMVZrVmJIbnBUQWN3cWhFTzNZUjlwb2NhcEZrOWYwYm8xVTc4bGRWckx2N3J6cE81Zk1XZjZla0VDYmI3VU9Sc2crSkNNcHlISEdNbWx4WkdTeHRBd240R3JGa1dWU0hMR0Z4aXlxemsyelVnSEFJOVdydG1XN1BwbW9JZW83dDljbXdwUGdoYUh3eEM5eWJHaGkyRXlGWjJQMVkwOG5jbWRlYXpjZ1NWTFFrL1JQZWFOcDRJbFo2UlJmcHdiMFhrdGRZZWl1eklCN3Y5WTBQVEFzTTdDVk5TTFBzSnl3M1RjYmJ1N080WVF4aGNWS2FEMTF4RGZjenhReDdNL3pHNzcvTlNzOTNoQ3Z6Rkt1TnF6dXIrcXVraDlvQ1dHb2t5ZUIzTGVHNXdFTEp0QThXOTZHVmxOVDF2UDFTMW4xaS8zRTBHMklYbEFRZE5ob3ozTDBVS3RGRFIzZTFINk9USDZueUk4cjBYTjVSZlZqUTNyT3JFTDJvRW1FTXdSNFRFM3NPbXNFekRNKyt0TjZvNUtxL0ttZ1hxTnluUWU2eVJRZnp3V04zTENHUmxGalhLT3dFYmhKN3lzOVhabDF0UW9Zejcrb2FZUFBZL1M4V1RsVnB3am1hZ0R2ZDgyY2Q3OE1FMmtqRFZXZmJiOU9VQVRnZ1Q4cW5rN0hGU1FaNFdSOGpGVVNVWGI0Wkh4TGZiVnM2bzFIV010NGVXdnAzbjFuRzMxR2RzSSswaWhkREkyalVUSWxXaUNtd0JETzJWYkpFT0NScFVtcUE0ZXU5dlFoS21Ed3ZPV2tXREFZMmZmc1hmbkJtN0s4SlRkUHk3ZXdndENhV0dzU0JpYndqQ2s4VzBEQkh6ZDI4c1p0RTJDcXBnNzg1c2Z6bSs2TzFMaVhGMnBsNXdnS2VJN0I5Z1J5NkxaVmJ0R2loWk1YcnQ0U25MOHhhVm5lM292VE05Y3NubE56a1JEalZtL1pDc2RsTlVxSWtjVG8ydW5pS1VMaEZQRjB1SUFyVHhGT0YwUEFrNG42YTBHcW04cFZXUjM1bS84UE5LbVA4R2RQd0tpL1M4K2VKWWNmdnJwOCtkWEQ3ZXYyZExyNGovbzdvcUE5cHlEVTBOU1FRSTAyTUlSNmEyWDlMVnFJSmpCUUUrTEhSMUZPZi9qdzB6VHljMHp0WmFINHFJNkF4LzR1bmZ4VkpPeGZVZzZ0ckk5ZlNBQmYvOEc0Y1RPM1lIdnJYLzh4TThzOFo0Nk56ZWlyYzUybEYyeXR0YVZqaG0xRGJBR21vdzlqNkpnbWpiVnRDQWFRZTkwYVE3Zjk2Q3BCSk1LUWtHV2NIZ2ZCR3d4d0pOeFd1aEVIdFN6V28yZ0Y4Rnc0MXFBVDBNaFFLc29qTlJPT05Da3pZYThCUjJJWnlmMjNNa1Q1MjUza2JwYWF2VnhjaFNhM01EZFRoR3Y3aU93QTNrZ0lJeGp4ZTRJemE1VjhaNlNiU2VqNjFuNk5WZkE2OG00VTVVUmRickNYdU1tS3U0aTBET0hXdlhoMlNEaWpOaFB0TWhHT1JtRG14b3Z3U0dvaWlwcEpRQ0VJMHpVcW1xYzZ1U3VzNis3VUxtd1gwTjhBYkxQT1VVa1A2QXFnSzN1Z05YcWRYOERqRlZRQm1LMklCQUVRR0d1V09JZVVXckk0aWFsaFpjL0k0bVN3UXpNNDJROFRKUGpBM3ZJWjJScFdFck5rTVNuMXJhZGVxZmNFR3JxY1lZcWord3NVOSt6N3VXWFVCSG1rN3drVS92UTRVK3hJSE4waEF2OVp4d2hpWi9nSTQ5YlRFaDNwL0pIWUVUN2RTVWxiTDR6TDhHRUg2UmlmOFJFTzlMZ1JpZnZEakZjWitDYkM4ajdMQUU1YXQzOTNKSmxIa3B4bzJCa09pZlZyTmh1alFQdm10ZnBFRHVETVJqTU5VQTFFV0ZZVVE3TUxuSVQybVF3VlF3N1YwN01JbnI5RFU1RE9PamdLc3AwUUhZSkhVT09Rcm5HM2g3ZCtmTG95RWsrUzMxdkpnZ1hDTFdRd0FNR0pFaGdFTzhvSEVEaXpBQnc4N2g1bHQrMSszMzg4QzQvdDYzcjJ6Y3IrRlAzMEVaMHdzVjUwK1laMlJybkVPSmRnSk5TZ3RmSzVQZm1IU3M2U01wbFNsbHdWN1NlYi9UZXZDTjJHR3ZQK3p2YVRSYXV3TktaVXlwU3pRUEFLZmJteS9GR0Nhek00YU9SZHJscWxWNmxRamlwZmU3dllzOU1UbDR4VDV0ckV6L1RYdWtzazdscC9rWEN5VW83VDR6b1AzbkxscWxIazc2NlZTTFM1eEVHMXMwVERkcXZxYVJZMjkxUzVzZkdKTzZ0cmI5MFNMNW40SUNhL0pqL204d05hRUkrYmx4OWVMdUM5elF1aVBRQmIzNWduTmIrWU9BdW03ODJPUW1YeEEzejZvekFZT3RUcTFXbGROdGlSdk5tS3ZRNWhnM1E0YnR3QStwQ0xyY01YZVN3alU3ZXRPc2E5TUwvbm9sbFZpQm9FWWRtRUpSRmhDdHAzeXI2cEtjNmlNWU1Xd0hDYW4wd2NoZWw5dTEwcnRIaUV6M2pvaVVPSFdydzVWWmdEeHNadWZiNzB2TnZnZVFDeVp6Q1diOEwzdzZUQkNpWkZITFhvSHE0WDcwUHhiUGpKakFxV0JodHgrTXJjY0UwZ1B6a2tocUl4R0ZLY29vTjEvRUJWV0hZRm5JQmZmOGZlN0dkZE5uYXZkNnVnU0piTWl4SkowR3B2NU5uWnlQVHVVb3EzZ2hVSkpRTGl2bzRJUFordmo1REhGOThqWjJMS0xUWE82UW1yTklkZkhrdUxGUlE2WmJucTUwUUk5RVg4MUNyeXQ1U1ZMTUoxKzdlZExzNVpMbnVBcjlmelFlRFFPSTZrakpENmNtSnJZcXlod0V6R2p3K1lmUFIyZEN1NkhmWHF0NzJkeWFBaXJHTmlhemkrVXZpU3FHd1orTEZ0VU8yWjJJNWUwMWlzclV0c1RQaU9aSGVIcEpuVk5wbWh0cGt6SmhVN2JLMDFNZUd4QkJ3eHhsMnRTYUdIcTA0cm9laGZHOE9OeFY5YjV5VmpNbVZxZ2ZCU1IySlppOXVBMERJTklvYk12dzA4OXRqa3U1YzAraXRQT1BOeGg5Yk82cEhFMjlHY2RTcU5Bbi9OV1phanQzbmc2TURBS0dtdkhkWnVjL3F2T2x0ck1sbDdkWHM3L2VNQjZyQmk5ZE1XMVRQa0V0U1NaN0VzS001M3JYbWhwYlZnWVBsQVVYL1JJZ0Z2QVZpZTZKanB3ZC9ud1kwVGM5alVVOUpIdE15UGRxTjJhSEl6Z3NlYmpNWVNnSnUwcFNTWG04M2haSE56UndRTVByRGJQL0o2blozRkdxMUdzLzYzOXZjemVNWU9ibmVFVUJuUGFyV0JyOXVnOEM1MjRZWnRtcW5SRVNvS0hHV2JheG1QZ1RUMm5PYUFiTE81SVMvZlNsWGprSFhiZEZ0cmhCTVpFK0ZKeDJxZXZhNjU2TjQrcXcxcEtOVEs1WW5NV3JUNllIQit0cW1lQnMwUE9NazFGM1dQZXQ1QXMyNE53R0EydjVuaDhBNkd5MU1oZFpDTTJReXlHM3FycEpFcXlBWmNyZUFuQ3NEZDhGa0FQWVRZRUlsR0lZd2Z2QjdVbWk2R3NWK2c1eWdDcXlGcU9Ub0hqd2JYZjlCSU9ia0gzY3IyR3dNMUlnNHBxbnRUWllrTUhZU0tmQVI2aHBWQWxzTy9BL2RXQnJkT2VGYy96dEE1aUNDTjBNSUZxSDZvMi93UGdIU3pEaU9yb0swUWthblF4aHpYUW0vY2FlWG9JUFFBQ1JiUUpSRWk0amgwa0tGUmlja2VxQU81NWtOVEk5cXAwRjIvSG1qT3l0RUZLRERMdEZBcGcvcnRISGlJemxEUy9iL3NOdzA4aWEvTXljRUt2bGxZUTI4QXdIVEw1OGRyQWlpK1haQUtGc0QxOG9BQWlEbkxvYzc4Ny84L1NQK25TSDd1U2h3ZDM4bzQrMzVtTTZnTFhuOUtCWmg0UUZ2ZDRPOFdRYkdzajNoQ1cxK2hxMUNYS0pzZ2g4MW0zRXhUYWlvWWxSRUExRU1BNUtqNUgzOHpUWGhBeUNnQTRxNWtGZGpMVDMvYkozNGd2MmFEWmFyeTk0UFpJQUlBWjloS2dBRU5BUURlS2dYZ0gwcms0UHdjbFVDQVp1YmdmOHBVQ2NVV0dFb3N5TEVWc0FiT3NUVkFBMlpzRDN5QS84b2pRQVJwQUFJd2hDV0FBUXlZZXFEZ0ZyTW95TUpJSVN4YVl5T0JIZGdjR3dVd29EKzJGVWdHRnpmR0duZ1dLUDhHOFpvdzM0QXJRYkhoN2kvc0FUaDd3cWJ2Tm9pVGNRZ0lyQVJNTTU0M2VlWTJSV3hqbVdKelFDZ1FBaldKNlFtMGRCT1J0TFcrYm1sUFhhY3BMZ3ppTldHK0FWZUNZbnB6TXRJSDRJeWhQbWtOUFIwYjVkUWhScGI0bFlEaHgzTlBOOC9jSm1MeHRuRWFaSW9OQjN5UUVRV002QU1udXVZSk5DWWRFdzVOMm1MZGFwOWx4VjNIWE55L2VHVzAwRngreDFsRlJrR0ZHZzFhZFA5NTlXT05NY0VVTTh3QlJKaFF4b1ZVMmxqbmd6Q0trelRMaTdLcW03YnJoM0dhbDNYYmovTzZuL2Y3L1ZRUVJ1bE1OcGN2RkV2bFNyVldielJiN1U2MzF4Kzg5TEp4VmgxYlUwRlpDM2FzN1pmVlk5N3BZSE1EMmIvQUhpdFg2Y2hGaFpIV1lOdXY2Z042K2txVDNFWVZRaDFYblRIaEdxNnY3VmQwcC9tYXF6enA5VHFxc2UxclV6bXE5dnphOUlDN2xWZXdDc1BFRmZ4Sm9SbjVhOVAySTV0Z3hrcFAzOXNLQWN3ZW9PMUtCb1lWVzJncTI5eFlUU3V1ckZRdWpUZmVqWnFma2FQS3YwZ01LLzVhZWgzU1NoZStLK0VFeEhULzFqNzBERDRpM1lDbUdBR05FaytZUHlRMVhLRGxwc2tORE93RlZsTmtnZHFqeDJhaHFiQk9BOUdYK0Rhb2N3OUUrZkE2TStKQkNlR3RQbXpiZitiNkordk11NGw4SjlHdXdqdm1KdzJnUTgxbkF4ZDBXNXlETERSZmNhcWtPTlQ4NGZlRytWU0QxbHR4NnluSWh3d29XbXNOKzg4cXBnQjVsRlBFbzh0MVBzVEZoa2Z5Q2JGWG9TbzNzTjhkSzBNd3ZudHNObElRZG9vSTRZZjBPZFQyaTg4VWpSUklHT3dHeUx3WGU1eGdZdXBXTkpQTURYWlpZOXZPSExpdzc5SE9XZ0FBQUFBPVwiKSBmb3JtYXQoXCJ3b2ZmMlwiKTtcbn1cblxuLnd0aWNvbnMge1xuXHRsaW5lLWhlaWdodDogMTtcbn1cblxuLnd0aWNvbnM6YmVmb3JlIHtcblx0Zm9udC1mYW1pbHk6IHd0aWNvbnMgIWltcG9ydGFudDtcblx0Zm9udC1zdHlsZTogbm9ybWFsO1xuXHRmb250LXdlaWdodDogbm9ybWFsICFpbXBvcnRhbnQ7XG5cdHZlcnRpY2FsLWFsaWduOiB0b3A7XG59XG5cbi53dGljb24tYWNjb3VudDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEwMVwiO1xufVxuLnd0aWNvbi1hZGQ6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMDJcIjtcbn1cbi53dGljb24tY2FyZFJlc2l6ZURyYWc6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMDNcIjtcbn1cbi53dGljb24tY2FzdWFsOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTA0XCI7XG59XG4ud3RpY29uLWNoZWNrOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTA1XCI7XG59XG4ud3RpY29uLWNoZWNrU21hbGw6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMDZcIjtcbn1cbi53dGljb24tY2hldnJvbjpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEwN1wiO1xufVxuLnd0aWNvbi1jb3B5OmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTA4XCI7XG59XG4ud3RpY29uLWNvcHlTbWFsbDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEwOVwiO1xufVxuLnd0aWNvbi1kaXNtaXNzOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTBhXCI7XG59XG4ud3RpY29uLWRvd25DaGV2cm9uOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTBiXCI7XG59XG4ud3RpY29uLWVycm9yOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTBjXCI7XG59XG4ud3RpY29uLWV4cGFuZDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEwZFwiO1xufVxuLnd0aWNvbi1mZWVkYmFjazpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEwZVwiO1xufVxuLnd0aWNvbi1maWxsZWREb3duQXJyb3c6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMGZcIjtcbn1cbi53dGljb24tZmluZDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExMFwiO1xufVxuLnd0aWNvbi1mb3JtYWw6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMTFcIjtcbn1cbi53dGljb24tZ2lmdDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExMlwiO1xufVxuLnd0aWNvbi1ncmF5TG9nbzpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExM1wiO1xufVxuLnd0aWNvbi1pZ25vcmU6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMTRcIjtcbn1cbi53dGljb24taW5mbzpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExNVwiO1xufVxuLnd0aWNvbi1sZWZ0Q2hldnJvbjpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExNlwiO1xufVxuLnd0aWNvbi1sb2dvOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTE3XCI7XG59XG4ud3RpY29uLWxvdmU6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMThcIjtcbn1cbi53dGljb24tbm9SZWNvbW1lbmRhdGlvbnM6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMTlcIjtcbn1cbi53dGljb24tcGFyYWdyYXBoUmV3cml0ZTpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExYVwiO1xufVxuLnd0aWNvbi1wYXN0ZTpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExYlwiO1xufVxuLnd0aWNvbi1waW46YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMWNcIjtcbn1cbi53dGljb24tcHJlbWl1bTpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjExZFwiO1xufVxuLnd0aWNvbi1wcmVtaXVtRGV0YWlsOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTFlXCI7XG59XG4ud3RpY29uLXByZW1pdW1GdWxsOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTFmXCI7XG59XG4ud3RpY29uLXJlY29tbWVuZGF0aW9uTGlnaHQ6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMjBcIjtcbn1cbi53dGljb24tcmVjb21tZW5kYXRpb25MaWdodENhcmQ6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMjFcIjtcbn1cbi53dGljb24tcmVjb21tZW5kYXRpb25MaWdodE5vU3VnZ2VzdGlvbnM6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMjJcIjtcbn1cbi53dGljb24tcmVmaW5lOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTIzXCI7XG59XG4ud3RpY29uLXJld3JpdGU6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMjRcIjtcbn1cbi53dGljb24tcmlnaHRDaGV2cm9uOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTI1XCI7XG59XG4ud3RpY29uLXJvY2tldDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEyNlwiO1xufVxuLnd0aWNvbi1zZW50ZW5jZUV4YW1wbGVzOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTI3XCI7XG59XG4ud3RpY29uLXNldHRpbmdzOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTI4XCI7XG59XG4ud3RpY29uLXNob3J0ZW46YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMjlcIjtcbn1cbi53dGljb24tdHV0b3JpYWw6YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMmFcIjtcbn1cbi53dGljb24tdW5sb2NrOmJlZm9yZSB7XG5cdGNvbnRlbnQ6IFwiXFxmMTJiXCI7XG59XG4ud3RpY29uLXdhcm46YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMmNcIjtcbn1cbi53dGljb24tV29yZHR1bmVCdXR0b246YmVmb3JlIHtcblx0Y29udGVudDogXCJcXGYxMmRcIjtcbn1cbi53dGljb24teDpiZWZvcmUge1xuXHRjb250ZW50OiBcIlxcZjEyZVwiO1xufVxuIl0sInNvdXJjZVJvb3QiOiIifQ== */</style></head>
+
+  <body style="zoom: 1;">
+    <div class="wrapper-masthead">
+      <div class="container">
+        <header class="masthead clearfix">
+          <a href="http://jalammar.github.io/" class="site-avatar"><img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/1007956"></a>
+
+          <div class="site-info">
+            <h1 class="site-name"><a href="http://jalammar.github.io/">Jay Alammar</a></h1>
+            <p class="site-description">Visualizing machine learning one concept at a time.<br><a href="https://twitter.com/JayAlammar">@JayAlammar</a> on Twitter. <a href="https://www.youtube.com/channel/UCmOwsoHty5PrmE-3QhUBfPQ">YouTube Channel</a></p>
+          </div>
+
+          <nav>
+            <a href="http://jalammar.github.io/">Blog</a>
+            <a href="http://jalammar.github.io/about">About</a>
+          </nav>
+        </header>
+      </div>
+    </div>
+
+    <div id="main" role="main" class="container">
+      <article class="post">
+  <h1>The Illustrated Transformer</h1>
+
+  <div class="entry prediction">
+    <p><span class="discussion">Discussions:
+<a href="https://news.ycombinator.com/item?id=18351674" class="hn-link">Hacker News (65 points, 4 comments)</a>, <a href="https://www.reddit.com/r/MachineLearning/comments/8uh2yz/p_the_illustrated_transformer_a_visual_look_at/" class="">Reddit r/MachineLearning (29 points, 3 comments)</a>
+</span>
+<br>
+<span class="discussion">Translations: <a href="https://www.mundhor.site/post/post14">Arabic</a>, <a href="https://blog.csdn.net/yujianmin1990/article/details/85221271">Chinese (Simplified) 1</a>, <a href="https://blog.csdn.net/qq_36667170/article/details/124359818">Chinese (Simplified) 2</a>, <a href="https://a-coles.github.io/2020/11/15/transformer-illustre.html">French 1</a>, <a href="https://lbourdois.github.io/blog/nlp/Transformer/">French 2</a>, <a href="https://tips-memo.com/translation-jayalmmar-transformer">Japanese</a>, <a href="https://nlpinkorean.github.io/illustrated-transformer/">Korean</a>, <a href="http://dml.qom.ac.ir/2022/05/17/illustrated-transformer/">Persian</a>, <a href="https://habr.com/ru/post/486358/">Russian</a>, <a href="https://hackernoon.com/el-transformador-ilustrado-una-traduccion-al-espanol-0y73wwp">Spanish</a>, <a href="https://trituenhantao.io/tin-tuc/minh-hoa-transformer/">Vietnamese</a></span>
+<br>
+<span class="discussion">Watch: MIT’s <a href="https://youtu.be/53YvP6gdD7U?t=432">Deep Learning State of the Art</a> lecture referencing this post</span></p>
+
+<p>In the <a href="https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/">previous post, we looked at Attention</a> – a ubiquitous method in modern deep learning models. Attention is a concept that helped improve the performance of neural machine translation applications. In this post, we will look at <strong>The Transformer</strong> – a model that uses attention to boost the speed with which these models can be trained. The Transformer outperforms the Google Neural Machine Translation model in specific tasks. The biggest benefit, however, comes from how The Transformer lends itself to parallelization. It is in fact Google Cloud’s recommendation to use The Transformer as a reference model to use their <a href="https://cloud.google.com/tpu/">Cloud TPU</a> offering. So let’s try to break the model apart and look at how it functions.</p>
+
+<p>The Transformer was proposed in the paper <a href="https://arxiv.org/abs/1706.03762">Attention is All You Need</a>. A TensorFlow implementation of it is available as a part of the <a href="https://github.com/tensorflow/tensor2tensor">Tensor2Tensor</a> package. Harvard’s NLP group created a <a href="http://nlp.seas.harvard.edu/2018/04/03/attention.html">guide annotating the paper with PyTorch implementation</a>. In this post, we will attempt to oversimplify things a bit and introduce the concepts one by one to hopefully make it easier to understand to people without in-depth knowledge of the subject matter.</p>
+
+<p><strong>2020 Update</strong>: I’ve created a “Narrated Transformer” video which is a gentler approach to the topic:</p>
+
+<div style="text-align:center">
+<iframe width="560" height="315" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/-QH8fRhqFHM.html" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" style="
+ width: 100%;
+ max-width: 560px;" allowfullscreen="" vnb-frameid="1292"></iframe>
+</div>
+<h2 id="a-high-level-look">A High-Level Look</h2>
+<p>Let’s begin by looking at the model as a single black box. In a machine translation application, it would take a sentence in one language, and output its translation in another.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/the_transformer_3.png">
+</div>
+
+<!--more-->
+
+<p>Popping open that Optimus Prime goodness, we see an encoding component, a decoding component, and connections between them.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/The_transformer_encoders_decoders.png">
+</div>
+
+<p>The encoding component is a stack of encoders (the paper stacks six of them on top of each other – there’s nothing magical about the number six, one can definitely experiment with other arrangements). The decoding component is a stack of decoders of the same number.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/The_transformer_encoder_decoder_stack.png">
+</div>
+
+<p>The encoders are all identical in structure (yet they do not share weights). Each one is broken down into two sub-layers:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/Transformer_encoder.png">
+</div>
+
+<p>The encoder’s inputs first flow through a self-attention layer – a layer that helps the encoder look at other words in the input sentence as it encodes a specific word. We’ll look closer at self-attention later in the post.</p>
+
+<p>The outputs of the self-attention layer are fed to a feed-forward neural network. The exact same feed-forward network is independently applied to each position.</p>
+
+<p>The decoder has both those layers, but between them is an attention layer that helps the decoder focus on relevant parts of the input sentence (similar what attention does in <a href="https://jalammar.github.io/visualizing-neural-machine-translation-mechanics-of-seq2seq-models-with-attention/">seq2seq models</a>).</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/Transformer_decoder.png">
+</div>
+
+<h2 id="bringing-the-tensors-into-the-picture">Bringing The Tensors Into The Picture</h2>
+
+<p>Now that we’ve seen the major components of the model, let’s start to look at the various vectors/tensors and how they flow between these components to turn the input of a trained model into an output.</p>
+
+<p>As is the case in NLP applications in general, we begin by turning each input word into a vector using an <a href="https://medium.com/deeper-learning/glossary-of-deep-learning-word-embedding-f90c3cec34ca">embedding algorithm</a>.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/embeddings.png">
+  <br>
+  Each word is embedded into a vector of size 512. We'll represent those vectors with these simple boxes.
+</div>
+
+<p>The embedding only happens in the bottom-most encoder. The abstraction that is common to all the encoders is that they receive a list of vectors each of the size 512 – In the bottom encoder that would be the word embeddings, but in other encoders, it would be the output of the encoder that’s directly below. The size of this list is hyperparameter we can set – basically it would be the length of the longest sentence in our training dataset.</p>
+
+<p>After embedding the words in our input sequence, each of them flows through each of the two layers of the encoder.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/encoder_with_tensors.png">
+  <br>
+
+</div>
+
+<p>Here we begin to see one key property of the Transformer, which is that the word in each position flows through its own path in the encoder. There are dependencies between these paths in the self-attention layer. The feed-forward layer does not have those dependencies, however, and thus the various paths can be executed in parallel while flowing through the feed-forward layer.</p>
+
+<p>Next, we’ll switch up the example to a shorter sentence and we’ll look at what happens in each sub-layer of the encoder.</p>
+
+<h2 id="now-were-encoding">Now We’re Encoding!</h2>
+
+<p>As we’ve mentioned already, an encoder receives a list of vectors as input. It processes this list by passing these vectors into a ‘self-attention’ layer, then into a feed-forward neural network, then sends out the output upwards to the next encoder.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/encoder_with_tensors_2.png">
+  <br>
+  The word at each position passes through a self-attention process. Then, they each pass through a feed-forward neural network -- the exact same network with each vector flowing through it separately.
+</div>
+
+<h2 id="self-attention-at-a-high-level">Self-Attention at a High Level</h2>
+<p>Don’t be fooled by me throwing around the word “self-attention” like it’s a concept everyone should be familiar with. I had personally never came across the concept until reading the Attention is All You Need paper. Let us distill how it works.</p>
+
+<p>Say the following sentence is an input sentence we want to translate:</p>
+
+<p>”<code class="language-plaintext highlighter-rouge">The animal didn't cross the street because it was too tired</code>”</p>
+
+<p>What does “it” in this sentence refer to? Is it referring to the street or to the animal? It’s a simple question to a human, but not as simple to an algorithm.</p>
+
+<p>When the model is processing the word “it”, self-attention allows it to associate “it” with “animal”.</p>
+
+<p>As the model processes each word (each position in the input sequence), self attention allows it to look at other positions in the input sequence for clues that can help lead to a better encoding for this word.</p>
+
+<p>If you’re familiar with RNNs, think of how maintaining a hidden state allows an RNN to incorporate its representation of previous words/vectors it has processed with the current one it’s processing. Self-attention is the method the Transformer uses to bake the “understanding” of other relevant words into the one we’re currently processing.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_self-attention_visualization.png">
+  <br>
+  As we are encoding the word "it" in encoder #5 (the top encoder in the stack), part of the attention mechanism was focusing on "The Animal", and baked a part of its representation into the encoding of "it".
+</div>
+
+<p>Be sure to check out the <a href="https://colab.research.google.com/github/tensorflow/tensor2tensor/blob/master/tensor2tensor/notebooks/hello_t2t.ipynb">Tensor2Tensor notebook</a> where you can load a Transformer model, and examine it using this interactive visualization.</p>
+
+<h2 id="self-attention-in-detail">Self-Attention in Detail</h2>
+<p>Let’s first look at how to calculate self-attention using vectors, then proceed to look at how it’s actually implemented – using matrices.</p>
+
+<p>The <strong>first step</strong> in calculating self-attention is to create three vectors from each of the encoder’s input vectors (in this case, the embedding of each word). So for each word, we create a Query vector, a Key vector, and a Value vector. These vectors are created by multiplying the embedding by three matrices that we trained during the training process.</p>
+
+<p>Notice that these new vectors are smaller in dimension than the embedding vector. Their dimensionality is 64, while the embedding and encoder input/output vectors have dimensionality of 512. They don’t HAVE to be smaller, this is an architecture choice to make the computation of multiheaded attention (mostly) constant.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_self_attention_vectors.png">
+  <br>
+  Multiplying <span class="encoder">x1</span> by the <span class="decoder">WQ</span> weight matrix produces <span class="decoder">q1</span>, the "query" vector associated with that word. We end up creating a "query", a "key", and a "value" projection of each word in the input sentence.
+</div>
+
+<p><br>
+<br></p>
+
+<p>What are the “query”, “key”, and “value” vectors?
+<br>
+<br>
+They’re abstractions that are useful for calculating and thinking about attention. Once you proceed with reading how attention is calculated below, you’ll know pretty much all you need to know about the role each of these vectors plays.</p>
+
+<p>The <strong>second step</strong> in calculating self-attention is to calculate a score. Say we’re calculating the self-attention for the first word in this example, “Thinking”. We need to score each word of the input sentence against this word. The score determines how much focus to place on other parts of the input sentence as we encode a word at a certain position.</p>
+
+<p>The score is calculated by taking the dot product of the <span class="decoder">query vector</span> with the <span class="context">key vector</span> of the respective word we’re scoring. So if we’re processing the self-attention for the word in position <span class="encoder">#1</span>, the first score would be the dot product of <span class="decoder">q1</span> and <span class="context">k1</span>. The second score would be the dot product of <span class="decoder">q1</span> and <span class="context">k2</span>.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_self_attention_score.png">
+  <br>
+
+</div>
+
+<p><br></p>
+
+<p>The <strong>third and fourth steps</strong> are to divide the scores by 8 (the square root of the dimension of the key vectors used in the paper – 64. This leads to having more stable gradients. There could be other possible values here, but this is the default), then pass the result through a softmax operation. Softmax normalizes the scores so they’re all positive and add up to 1.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/self-attention_softmax.png">
+  <br>
+
+</div>
+
+<p>This softmax score determines how much each word will be expressed at this position. Clearly the word at this position will have the highest softmax score, but sometimes it’s useful to attend to another word that is relevant to the current word.</p>
+
+<p><br></p>
+
+<p>The <strong>fifth step</strong> is to multiply each value vector by the softmax score (in preparation to sum them up). The intuition here is to keep intact the values of the word(s) we want to focus on, and drown-out irrelevant words (by multiplying them by tiny numbers like 0.001, for example).</p>
+
+<p>The <strong>sixth step</strong> is to sum up the weighted value vectors. This produces the output of the self-attention layer at this position (for the first word).</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/self-attention-output.png">
+  <br>
+</div>
+
+<p>That concludes the self-attention calculation. The resulting vector is one we can send along to the feed-forward neural network. In the actual implementation, however, this calculation is done in matrix form for faster processing. So let’s look at that now that we’ve seen the intuition of the calculation on the word level.</p>
+
+<h2 id="matrix-calculation-of-self-attention">Matrix Calculation of Self-Attention</h2>
+<p><strong>The first step</strong> is to calculate the Query, Key, and Value matrices. We do that by packing our embeddings into a matrix <span class="encoder">X</span>, and multiplying it by the weight matrices we’ve trained (<span class="decoder">WQ</span>, <span class="context">WK</span>, <span class="step_no">WV</span>).</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/self-attention-matrix-calculation.png">
+  <br>
+  Every row in the <span class="encoder">X</span> matrix corresponds to a word in the input sentence. We again see the difference in size of the embedding vector (512, or 4 boxes in the figure), and the q/k/v vectors (64, or 3 boxes in the figure)
+</div>
+
+<p><br></p>
+
+<p><strong>Finally</strong>, since we’re dealing with matrices, we can condense steps two through six in one formula to calculate the outputs of the self-attention layer.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/self-attention-matrix-calculation-2.png">
+  <br>
+  The self-attention calculation in matrix form
+</div>
+
+<p><br></p>
+
+<p><br></p>
+
+<h2 id="the-beast-with-many-heads">The Beast With Many Heads</h2>
+
+<p>The paper further refined the self-attention layer by adding a mechanism called “multi-headed” attention. This improves the performance of the attention layer in two ways:</p>
+
+<ol>
+  <li>
+    <p>It expands the model’s ability to focus on different positions. Yes, in the example above, z1 contains a little bit of every other encoding, but it could be dominated by the actual word itself. If we’re translating a sentence like “The animal didn’t cross the street because it was too tired”, it would be useful to know which word “it” refers to.</p>
+  </li>
+  <li>
+    <p>It gives the attention layer multiple “representation subspaces”. As we’ll see next, with multi-headed attention we have not only one, but multiple sets of Query/Key/Value weight matrices (the Transformer uses eight attention heads, so we end up with eight sets for each encoder/decoder). Each of these sets is randomly initialized. Then, after training, each set is used to project the input embeddings (or vectors from lower encoders/decoders) into a different representation subspace.</p>
+  </li>
+</ol>
+
+<div class="img-div-any-width">
+   <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_attention_heads_qkv.png">
+   <br>
+   With multi-headed attention, we maintain separate Q/K/V weight matrices for each head resulting in different Q/K/V matrices. As we did before, we multiply X by the WQ/WK/WV matrices to produce Q/K/V matrices.
+ </div>
+
+<p><br>
+If we do the same self-attention calculation we outlined above, just eight different times with different weight matrices, we end up with eight different Z matrices</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_attention_heads_z.png">
+  <br>
+
+</div>
+
+<p><br></p>
+
+<p>This leaves us with a bit of a challenge. The feed-forward layer is not expecting eight matrices – it’s expecting a single matrix (a vector for each word). So we need a way to condense these eight down into a single matrix.</p>
+
+<p>How do we do that? We concat the matrices then multiply them by an additional weights matrix WO.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_attention_heads_weight_matrix_o.png">
+  <br>
+
+</div>
+
+<p>That’s pretty much all there is to multi-headed self-attention. It’s quite a handful of matrices, I realize. Let me try to put them all in one visual so we can look at them in one place</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_multi-headed_self-attention-recap.png">
+  <br>
+
+</div>
+
+<p><br></p>
+
+<p>Now that we have touched upon attention heads, let’s revisit our example from before to see where the different attention heads are focusing as we encode the word “it” in our example sentence:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_self-attention_visualization_2.png">
+  <br>
+  As we encode the word "it", one attention head is focusing most on "the animal", while another is focusing on "tired" -- in a sense, the model's representation of the word "it" bakes in some of the representation of both "animal" and "tired".
+</div>
+
+<p><br></p>
+
+<p>If we add all the attention heads to the picture, however, things can be harder to interpret:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_self-attention_visualization_3.png">
+  <br>
+</div>
+
+<h2 id="representing-the-order-of-the-sequence-using-positional-encoding">Representing The Order of The Sequence Using Positional Encoding</h2>
+<p>One thing that’s missing from the model as we have described it so far is a way to account for the order of the words in the input sequence.</p>
+
+<p>To address this, the transformer adds a vector to each input embedding. These vectors follow a specific pattern that the model learns, which helps it determine the position of each word, or the distance between different words in the sequence. The intuition here is that adding these values to the embeddings provides meaningful distances between the embedding vectors once they’re projected into Q/K/V vectors and during dot-product attention.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_positional_encoding_vectors.png">
+  <br>
+  To give the model a sense of the order of the words, we add positional encoding vectors -- the values of which follow a specific pattern.
+</div>
+<p><br></p>
+
+<p>If we assumed the embedding has a dimensionality of 4, the actual positional encodings would look like this:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_positional_encoding_example.png">
+  <br>
+  A real example of positional encoding with a toy embedding size of 4
+</div>
+
+<p><br></p>
+
+<p>What might this pattern look like?</p>
+
+<p>In the following figure, each row corresponds to a positional encoding of a vector. So the first row would be the vector we’d add to the embedding of the first word in an input sequence. Each row contains 512 values – each with a value between 1 and -1. We’ve color-coded them so the pattern is visible.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_positional_encoding_large_example.png">
+  <br>
+  A real example of positional encoding for 20 words (rows) with an embedding size of 512 (columns). You can see that it appears split in half down the center. That's because the values of the left half are generated by one function (which uses sine), and the right half is generated by another function (which uses cosine). They're then concatenated to form each of the positional encoding vectors.
+</div>
+
+<p>The formula for positional encoding is described in the paper (section 3.5). You can see the code for generating positional encodings in <a href="https://github.com/tensorflow/tensor2tensor/blob/23bd23b9830059fbc349381b70d9429b5c40a139/tensor2tensor/layers/common_attention.py"><code class="language-plaintext highlighter-rouge">get_timing_signal_1d()</code></a>. This is not the only possible method for positional encoding. It, however, gives the advantage of being able to scale to unseen lengths of sequences (e.g. if our trained model is asked to translate a sentence longer than any of those in our training set).</p>
+
+<p><strong>July 2020 Update:</strong> 
+The positional encoding shown above is from the Tranformer2Transformer implementation of the Transformer. The method shown in the paper is slightly different in that it doesn’t directly concatenate, but interweaves the two signals. The following figure shows what that looks like. <a href="https://github.com/jalammar/jalammar.github.io/blob/master/notebookes/transformer/transformer_positional_encoding_graph.ipynb">Here’s the code to generate it</a>:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/attention-is-all-you-need-positional-encoding.png">
+  <br>
+</div>
+
+<h2 id="the-residuals">The Residuals</h2>
+<p>One detail in the architecture of the encoder that we need to mention before moving on, is that each sub-layer (self-attention, ffnn) in each encoder has a residual connection around it, and is followed by a <a href="https://arxiv.org/abs/1607.06450">layer-normalization</a> step.</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_resideual_layer_norm.png">
+  <br>
+</div>
+
+<p>If we’re to visualize the vectors and the layer-norm operation associated with self attention, it would look like this:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_resideual_layer_norm_2.png">
+  <br>
+</div>
+
+<p>This goes for the sub-layers of the decoder as well. If we’re to think of a Transformer of 2 stacked encoders and decoders, it would look something like this:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_resideual_layer_norm_3.png">
+  <br>
+</div>
+
+<h2 id="the-decoder-side">The Decoder Side</h2>
+<p>Now that we’ve covered most of the concepts on the encoder side, we basically know how the components of decoders work as well. But let’s take a look at how they work together.</p>
+
+<p>The encoder start by processing the input sequence. The output of the top encoder is then transformed into a set of attention vectors K and V. These are to be used by each decoder in its “encoder-decoder attention” layer which helps the decoder focus on appropriate places in the input sequence:</p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_decoding_1.gif">
+  <br>
+  After finishing the encoding phase, we begin the decoding phase. Each step in the decoding phase outputs an element from the output sequence (the English translation sentence in this case).
+</div>
+
+<p>The following steps repeat the process until a special <end of="" sentence=""> symbol is reached indicating the transformer decoder has completed its output. The output of each step is fed to the bottom decoder in the next time step, and the decoders bubble up their decoding results just like the encoders did. And just like we did with the encoder inputs, we embed and add positional encoding to those decoder inputs to indicate the position of each word.</end></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_decoding_2.gif">
+  <br>
+
+</div>
+
+<p>The self attention layers in the decoder operate in a slightly different way than the one in the encoder:</p>
+
+<p>In the decoder, the self-attention layer is only allowed to attend to earlier positions in the output sequence. This is done by masking future positions (setting them to <code class="language-plaintext highlighter-rouge">-inf</code>) before the softmax step in the self-attention calculation.</p>
+
+<p>The “Encoder-Decoder Attention” layer works just like multiheaded self-attention, except it creates its Queries matrix from the layer below it, and takes the Keys and Values matrix from the output of the encoder stack.</p>
+
+<h2 id="the-final-linear-and-softmax-layer">The Final Linear and Softmax Layer</h2>
+
+<p>The decoder stack outputs a vector of floats. How do we turn that into a word? That’s the job of the final Linear layer which is followed by a Softmax Layer.</p>
+
+<p>The Linear layer is a simple fully connected neural network that projects the vector produced by the stack of decoders, into a much, much larger vector called a logits vector.</p>
+
+<p>Let’s assume that our model knows 10,000 unique English words (our model’s “output vocabulary”) that it’s learned from its training dataset. This would make the logits vector 10,000 cells wide – each cell corresponding to the score of a unique word. That is how we interpret the output of the model followed by the Linear layer.</p>
+
+<p>The softmax layer then turns those scores into probabilities (all positive, all add up to 1.0). The cell with the highest probability is chosen, and the word associated with it is produced as the output for this time step.</p>
+
+<p><br></p>
+
+<div class="img-div-any-width">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_decoder_output_softmax.png">
+  <br>
+  This figure starts from the bottom with the vector produced as the output of the decoder stack. It is then turned into an output word.
+</div>
+
+<p><br></p>
+
+<h2 id="recap-of-training">Recap Of Training</h2>
+<p>Now that we’ve covered the entire forward-pass process through a trained Transformer, it would be useful to glance at the intuition of training the model.</p>
+
+<p>During training, an untrained model would go through the exact same forward pass. But since we are training it on a labeled training dataset, we can compare its output with the actual correct output.</p>
+
+<p>To visualize this, let’s assume our output vocabulary only contains six words(“a”, “am”, “i”, “thanks”, “student”, and “&lt;eos&gt;” (short for ‘end of sentence’)).</p>
+
+<div class="img-div">
+   <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/vocabulary.png">
+   <br>
+   The output vocabulary of our model is created in the preprocessing phase before we even begin training.
+ </div>
+
+<p>Once we define our output vocabulary, we can use a vector of the same width to indicate each word in our vocabulary. This also known as one-hot encoding. So for example, we can indicate the word “am” using the following vector:</p>
+
+<div class="img-div">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/one-hot-vocabulary-example.png">
+  <br>
+  Example: one-hot encoding of our output vocabulary
+</div>
+
+<p>Following this recap, let’s discuss the model’s loss function – the metric we are optimizing during the training phase to lead up to a trained and hopefully amazingly accurate model.</p>
+
+<h2 id="the-loss-function">The Loss Function</h2>
+<p>Say we are training our model. Say it’s our first step in the training phase, and we’re training it on a simple example – translating “merci” into “thanks”.</p>
+
+<p>What this means, is that we want the output to be a probability distribution indicating the word “thanks”. But since this model is not yet trained, that’s unlikely to happen just yet.</p>
+
+<div class="img-div">
+  <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/transformer_logits_output_and_label.png">
+  <br>
+  Since the model's parameters (weights) are all initialized randomly, the (untrained) model produces a probability distribution with arbitrary values for each cell/word. We can compare it with the actual output, then tweak all the model's weights using backpropagation to make the output closer to the desired output.
+</div>
+
+<p><br></p>
+
+<p>How do you compare two probability distributions? We simply subtract one from the other. For more details, look at  <a href="https://colah.github.io/posts/2015-09-Visual-Information/">cross-entropy</a> and <a href="https://www.countbayesie.com/blog/2017/5/9/kullback-leibler-divergence-explained">Kullback–Leibler divergence</a>.</p>
+
+<p>But note that this is an oversimplified example. More realistically, we’ll use a sentence longer than one word. For example – input: “je suis étudiant” and expected output: “i am a student”. What this really means, is that we want our model to successively output probability distributions where:</p>
+
+<ul>
+  <li>Each probability distribution is represented by a vector of width vocab_size (6 in our toy example, but more realistically a number like 30,000 or 50,000)</li>
+  <li>The first probability distribution has the highest probability at the cell associated with the word “i”</li>
+  <li>The second probability distribution has the highest probability at the cell associated with the word “am”</li>
+  <li>And so on, until the fifth output distribution indicates ‘<code class="language-plaintext highlighter-rouge">&lt;end of sentence&gt;</code>’ symbol, which also has a cell associated with it from the 10,000 element vocabulary.</li>
+</ul>
+
+<div class="img-div">
+   <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/output_target_probability_distributions.png">
+   <br>
+   The targeted probability distributions we'll train our model against in the training example for one sample sentence.
+ </div>
+
+<p><br></p>
+
+<p>After training the model for enough time on a large enough dataset, we would hope the produced probability distributions would look like this:</p>
+
+<div class="img-div">
+    <img src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/output_trained_model_probability_distributions.png">
+    <br>
+    Hopefully upon training, the model would output the right translation we expect. Of course it's no real indication if this phrase was part of the training dataset (see: <a href="https://www.youtube.com/watch?v=TIgfjmp-4BA">cross validation</a>). Notice that every position gets a little bit of probability even if it's unlikely to be the output of that time step -- that's a very useful property of softmax which helps the training process.
+</div>
+
+<p>Now, because the model produces the outputs one at a time, we can assume that the model is selecting the word with the highest probability from that probability distribution and throwing away the rest. That’s one way to do it (called greedy decoding). Another way to do it would be to hold on to, say, the top two words (say, ‘I’ and ‘a’ for example), then in the next step, run the model twice: once assuming the first output position was the word ‘I’, and another time assuming the first output position was the word ‘a’, and whichever version produced less error considering both positions #1 and #2 is kept. We repeat this for positions #2 and #3…etc. This method is called “beam search”, where in our example, beam_size was two (meaning that at all times, two partial hypotheses (unfinished translations) are kept in memory), and top_beams is also two (meaning we’ll return two translations). These are both hyperparameters that you can experiment with.</p>
+
+<h2 id="go-forth-and-transform">Go Forth And Transform</h2>
+
+<p>I hope you’ve found this a useful place to start to break the ice with the major concepts of the Transformer. If you want to go deeper, I’d suggest these next steps:</p>
+
+<ul>
+  <li>Read the <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> paper, the Transformer blog post (<a href="https://ai.googleblog.com/2017/08/transformer-novel-neural-network.html">Transformer: A Novel Neural Network Architecture for Language Understanding</a>), and the <a href="https://ai.googleblog.com/2017/06/accelerating-deep-learning-research.html">Tensor2Tensor announcement</a>.</li>
+  <li>Watch <a href="https://www.youtube.com/watch?v=rBCqOTEfxvg">Łukasz Kaiser’s talk</a> walking through the model and its details</li>
+  <li>Play with the <a href="https://colab.research.google.com/github/tensorflow/tensor2tensor/blob/master/tensor2tensor/notebooks/hello_t2t.ipynb">Jupyter Notebook provided as part of the Tensor2Tensor repo</a></li>
+  <li>Explore the <a href="https://github.com/tensorflow/tensor2tensor">Tensor2Tensor repo</a>.</li>
+</ul>
+
+<p>Follow-up works:</p>
+
+<ul>
+  <li><a href="https://arxiv.org/abs/1706.03059">Depthwise Separable Convolutions for Neural Machine Translation</a></li>
+  <li><a href="https://arxiv.org/abs/1706.05137">One Model To Learn Them All</a></li>
+  <li><a href="https://arxiv.org/abs/1801.09797">Discrete Autoencoders for Sequence Models</a></li>
+  <li><a href="https://arxiv.org/abs/1801.10198">Generating Wikipedia by Summarizing Long Sequences</a></li>
+  <li><a href="https://arxiv.org/abs/1802.05751">Image Transformer</a></li>
+  <li><a href="https://arxiv.org/abs/1804.00247">Training Tips for the Transformer Model</a></li>
+  <li><a href="https://arxiv.org/abs/1803.02155">Self-Attention with Relative Position Representations</a></li>
+  <li><a href="https://arxiv.org/abs/1803.03382">Fast Decoding in Sequence Models using Discrete Latent Variables</a></li>
+  <li><a href="https://arxiv.org/abs/1804.04235">Adafactor: Adaptive Learning Rates with Sublinear Memory Cost</a></li>
+</ul>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Thanks to <a href="https://twitter.com/ilblackdragon">Illia Polosukhin</a>, <a href="http://jakob.uszkoreit.net/">Jakob Uszkoreit</a>, <a href="https://www.linkedin.com/in/llion-jones-9ab3064b">Llion Jones </a>, <a href="https://ai.google/research/people/LukaszKaiser">Lukasz Kaiser</a>, <a href="https://twitter.com/nikiparmar09">Niki Parmar</a>, and <a href="https://dblp.org/pers/hd/s/Shazeer:Noam">Noam Shazeer</a> for providing feedback on earlier versions of this post.</p>
+
+<p>Please hit me up on <a href="https://twitter.com/JayAlammar">Twitter</a> for any corrections or feedback.</p>
+
+  </div>
+
+  <div class="date">
+    Written on June 27, 2018
+  </div>
+
+  
+</article>
+
+    </div><div id="rootReactVNB" class="rootReactVNB"><div style="display: none; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 2000000000; background: red; opacity: 0;"></div><div class="ModalOverlay-sc-rn9ey7 dIuWHJ"><div width="360px" class="ModalContent-sc-1byo0d8 kZcOAB"><div class="ModalHeader-sc-1q7dtzz bJwUBx"><h5 class="ModalHeading-sc-rwjzr7 fOGVrh"><div class="LogoWrapper-sc-ssd9p0 indTSF StyledLogo-sc-wamwi6 fOCdIe"><div class="Image-sc-mngam5 fmghtm"></div></div>We need your help:</h5><div class="CloseButton-sc-eod3hf jgEzBl"><div class="IconImage-sc-1oekuv0 idcWUa" color="grey100" width="24px" height="24px"></div></div></div><div class="ModalBody-sc-mej6ip eWgdsE">Video Notebook needs access to your Google Drive to link your notes on Google Meet to recordings stored on Google Drive</div><div class="ModalFooter-sc-1cykhbu cximxh"><button type="primary" width="auto" height="40px" loading="false" class="ButtonContainer-sc-1eabuu8 blwkrT">Authorize</button><button type="secondary" width="auto" height="40px" loading="false" class="ButtonContainer-sc-1eabuu8 kgtBlH">Not now...</button><button type="secondary" width="auto" height="40px" loading="false" class="ButtonContainer-sc-1eabuu8 kgtBlH">Don't ask me anymore</button></div></div></div><link rel="stylesheet" type="text/css" href="chrome-extension://hbklahkfbghjgbclbfcnhpfmajkagnci/css/fonts.css"><style>
+  #dialogContainer {
+    flex-grow: 1 !important;
+    position: fixed !important;
+    background: rgba(255, 255, 255, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+    border-radius: 10px !important;
+    display: flex;
+    flex-direction: column !important;
+    box-shadow: 0 0 5px rgba(35, 35, 35, 0.5) !important;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) {
+    min-width: 295px !important;
+  }
+  
+  .VN--hide {
+    display:none !important;
+  }
+  
+  .VN--show {
+    display: flex !important;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0) !important;
+    transition-property: background, border;
+    transition-duration: 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover,
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] {
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) > div > div:not([class^="AddonHeader__HeaderDivStyle"]) {
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover > div > div,
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] > div > div {
+    opacity: 1;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) div[class^="ButtonsWrapper"] {
+    background-color: transparent;
+    transition-property: background-color;
+    transition-duration: 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover div[class^="ButtonsWrapper"],
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] div[class^="ButtonsWrapper"] {
+    background-color: #dddddd;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) div[class^="AddonFooter__DivStyled"] {
+    opacity: 0.5;
+    background-color: transparent;
+    transition-property: background-color, opacity;
+    transition-duration: 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover div[class^="AddonFooter__DivStyled"],
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] div[class^="AddonFooter__DivStyled"] {
+    background-color: #dddddd;
+    opacity: 1;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) span[class^="ControlContainer"] {
+    border-color: transparent;
+    transition: border-color 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover span[class^="ControlContainer"],
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] span[class^="ControlContainer"] {
+    border-color: #dddddd;
+  }
+  
+  #dialogContainer:not(.dialogMinimized) div[class*="SeparatorStyledDiv"] {
+    border-color: transparent;
+    transition: border-color 0.2s;
+  }
+  
+  #dialogContainer:not(.dialogMinimized):hover div[class*="SeparatorStyledDiv"],
+  #dialogContainer:not(.dialogMinimized)[is-active="true"] div[class*="SeparatorStyledDiv"] {
+    border-color: #bbbbbb;
+  }
+  
+  #dialogContainer .ProseMirror strong {
+    font-family: 'Roboto-bold', sans-serif;
+  }
+  
+  #dialogContainer.positionRightTop{
+    top: 10px;
+    right: 10px;
+    max-height: 600px;
+    min-height: fit-content;
+  }
+  
+  #dialogContainer.positionRightTop.gmeet{
+    top: 50px !important;
+  }
+  
+  #dialogContainer.positionLeftTop{
+    top: 10px;
+    left: 10px;
+    max-height: 600px;
+    min-height: fit-content;
+  }
+  
+  #dialogContainer.dialogMinimized{
+    max-width: 114px;
+  }
+  
+  #dialogContainer.positionRightBottom{
+    right: 10px;
+    bottom: 10px;
+    max-height: 400px;
+    min-height: 63px;
+  }
+  
+  #dialogContainer.positionLeftBottom{
+    left: 10px;
+    bottom: 10px;
+    max-height: 400px;
+    min-height: 63px;
+  }
+  
+  .overflow{
+    height: 270px;
+    overflow-y: auto !important;
+  }
+  
+  .VN--hide {
+    display:none!important;
+    visibility: hidden;
+  }
+  
+  .VN--show {
+    display: flex;
+  }
+</style><div id="dialogContainer" class="VN--show positionRightTop dialogMinimized react-draggable" style="transform: translate(0px, 0px);"><div id="workAroundDiv" class="WorkAroundDivStyled-sc-hfr1pv befcyA"></div></div></div><link rel="stylesheet" href="chrome-extension://hbklahkfbghjgbclbfcnhpfmajkagnci/css/iframe.css" id="videoNoteFrameStyle">
+
+
+
+    <!-- Begin Mailchimp Signup Form -->
+    <link href="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/classic-10_7.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+    	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
+    	/* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
+    	   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+    </style>
+    <div id="mc_embed_signup">
+    <form action="https://github.us19.list-manage.com/subscribe/post?u=2a4ade7dafcdbbf2eb4aae3cf&amp;id=f1f8c03f13" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="novalidate">
+        <div id="mc_embed_signup_scroll">
+    	<h2>Subscribe to get notified about upcoming posts by email</h2>
+    <div class="mc-field-group">
+    	<label for="mce-EMAIL">Email Address </label>
+    	<input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" aria-required="true">
+    </div>
+    	<div id="mce-responses" class="clear">
+    		<div class="response" id="mce-error-response" style="display:none"></div>
+    		<div class="response" id="mce-success-response" style="display:none"></div>
+    	</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+        <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_2a4ade7dafcdbbf2eb4aae3cf_f1f8c03f13" tabindex="-1" value=""></div>
+        <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+        </div>
+    </form>
+    </div>
+    <script type="text/javascript" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/mc-validate.js.download"></script><script type="text/javascript">(function($) {window.fnames = new Array(); window.ftypes = new Array();fnames[0]='EMAIL';ftypes[0]='email';fnames[1]='FNAME';ftypes[1]='text';fnames[2]='LNAME';ftypes[2]='text';fnames[3]='ADDRESS';ftypes[3]='address';fnames[4]='PHONE';ftypes[4]='phone';fnames[5]='BIRTHDAY';ftypes[5]='birthday';}(jQuery));var $mcj = jQuery.noConflict(true);</script>
+    <!--End mc_embed_signup-->
+
+<div style="padding: 10px 0 10px 3%; color: #555; font-size:85%">
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="./The Illustrated Transformer – Jay Alammar – Visualizing machine learning one concept at a time._files/88x31.png"></a><br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+
+<br>
+Attribution example:
+<br>
+<i>Alammar, J (2018). The Illustrated Transformer [Blog post]. Retrieved from <a href="https://jalammar.github.io/illustrated-transformer/">https://jalammar.github.io/illustrated-transformer/</a></i>
+
+<br><br>
+Note: If you translate any of the posts, let me know so I can link your translation to the original post. My email is in the <a href="http://jalammar.github.io/about">about page</a>.
+</div>
+
+
+    <div class="wrapper-footer">
+      <div class="container">
+        <footer class="footer">
+          
+
+
+
+<a href="https://github.com/jalammar"><i class="svg-icon github"></i></a>
+
+<a href="https://www.linkedin.com/in/jalammar"><i class="svg-icon linkedin"></i></a>
+
+
+<a href="https://www.twitter.com/jayalammar"><i class="svg-icon twitter"></i></a>
+
+
+
+        </footer>
+      </div>
+    </div>
+
+    
+	<!-- Google Analytics -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-71956058-1', 'auto');
+		ga('send', 'pageview', {
+		  'page': '/illustrated-transformer/',
+		  'title': 'The Illustrated Transformer'
+		});
+	</script>
+	<!-- End Google Analytics -->
+
+
+  
+
+</body></html>
