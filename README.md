@@ -6,6 +6,7 @@
   * https://aman.ai/cs224n/
 * Natural Language Processing Specialization on Coursera (offered by deeplearning.ai) 
   * https://aman.ai/coursera-nlp/
+  * https://github.com/vg11072001/coursera-natural-language-processing-specialization
 * https://github.com/vg11072001/NLP-with-Python 
 * [Live NLP Playlist](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn) 
 
