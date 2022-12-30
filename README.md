@@ -2,6 +2,10 @@
 
 ### Resources 
 * [Stanford CS224N: NLP with Deep Learning | Winter 2021](https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ)
+* CS224n: Natural Language Processing with Deep Learning
+  * https://aman.ai/cs224n/
+* Natural Language Processing Specialization on Coursera (offered by deeplearning.ai) 
+  * https://aman.ai/coursera-nlp/
 * https://github.com/vg11072001/NLP-with-Python 
 * [Live NLP Playlist](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn) 
 
