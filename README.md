@@ -9,6 +9,7 @@
   * https://github.com/vg11072001/coursera-natural-language-processing-specialization
 * https://github.com/vg11072001/NLP-with-Python 
 * [Live NLP Playlist](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn) 
+* [Awesome Deep Learning for Natural Language Processing (NLP)](https://github.com/brianspiering/awesome-dl4nlp#table-of-contents)
 
 ![image](https://user-images.githubusercontent.com/67424390/209301541-3866b696-3aaf-498b-b0e9-304615dacfa0.png)
 
