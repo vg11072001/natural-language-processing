@@ -10,5 +10,5 @@
 ## Step 1
 ![image](https://user-images.githubusercontent.com/67424390/209412930-4dcf4114-bd4b-450f-90f3-246e2254fb17.png)
 
-##Step 2
+## Step 2
 ![image](https://user-images.githubusercontent.com/67424390/209435353-c6b766dd-bbea-430e-ae48-9266434c7117.png)
