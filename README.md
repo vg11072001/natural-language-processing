@@ -18,3 +18,6 @@
 
 ## Step 2
 ![image](https://user-images.githubusercontent.com/67424390/209435353-c6b766dd-bbea-430e-ae48-9266434c7117.png)
+
+## PI
+* https://www.kaggle.com/code/tanulsingh077/deep-learning-for-nlp-zero-to-transformers-bert 
