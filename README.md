@@ -10,6 +10,7 @@
 * https://github.com/vg11072001/NLP-with-Python 
 * [Live NLP Playlist](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn) 
 * [Awesome Deep Learning for Natural Language Processing (NLP)](https://github.com/brianspiering/awesome-dl4nlp#table-of-contents)
+* https://course.fast.ai/Lessons/lesson4.html
 
 ![image](https://user-images.githubusercontent.com/67424390/209301541-3866b696-3aaf-498b-b0e9-304615dacfa0.png)
 
@@ -21,3 +22,7 @@
 
 ## PI
 * https://www.kaggle.com/code/tanulsingh077/deep-learning-for-nlp-zero-to-transformers-bert 
+* https://towardsdatascience.com/building-nlp-powered-applications-with-hugging-face-transformers-9f561effc84f & https://github.com/jackmleitch/EssayCompanion
+* https://huggingface.co/welcome
+* Reasearch papers - https://machinelearningmastery.com/applications-of-deep-learning-for-natural-language-processing/
+* 
