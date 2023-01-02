@@ -9,7 +9,6 @@
   * https://github.com/vg11072001/coursera-natural-language-processing-specialization
 * https://github.com/vg11072001/NLP-with-Python 
 * [Live NLP Playlist](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn)
-* [Transformers And Bert Implementation](https://www.youtube.com/playlist?list=PLZoTAELRMXVOTsz2jZl2Oq3ntWPoKRKwv)
 * Codes in NLP, Deep Learning, Reinforcement Learning and Artificial Intelligence: https://github.com/RubensZimbres/Repo-2017/
 * [Awesome Deep Learning for Natural Language Processing (NLP)](https://github.com/brianspiering/awesome-dl4nlp#table-of-contents)
 * https://course.fast.ai/Lessons/lesson4.html
