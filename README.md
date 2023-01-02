@@ -1,6 +1,7 @@
 # natural-language-processing
 
 ### Useful
+* [Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
 * [Illustrated bert](https://jalammar.github.io/illustrated-bert/)
 
 ### Resources 
