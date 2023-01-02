@@ -28,4 +28,3 @@
 * https://towardsdatascience.com/building-nlp-powered-applications-with-hugging-face-transformers-9f561effc84f & https://github.com/jackmleitch/EssayCompanion
 * https://huggingface.co/welcome
 * Reasearch papers - https://machinelearningmastery.com/applications-of-deep-learning-for-natural-language-processing/
-* 
