@@ -27,4 +27,5 @@
 * https://www.kaggle.com/code/tanulsingh077/deep-learning-for-nlp-zero-to-transformers-bert 
 * https://towardsdatascience.com/building-nlp-powered-applications-with-hugging-face-transformers-9f561effc84f & https://github.com/jackmleitch/EssayCompanion
 * https://huggingface.co/welcome
+* https://odsc.medium.com/12-most-popular-nlp-projects-of-2022-so-far-e11cd01e9a8
 * Reasearch papers - https://machinelearningmastery.com/applications-of-deep-learning-for-natural-language-processing/
