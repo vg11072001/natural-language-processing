@@ -15,9 +15,10 @@
   * [Transformer](https://github.com/msaroufim/RLnotes/blob/master/transformer.md)
 
 
-### Third
+### Third - Official Hugging Face site
 * [🤗 Transformers Notebooks](https://huggingface.co/docs/transformers/main/en/notebooks)
 * [Tutorials by Hugging face for fine tune, processing, etc](https://huggingface.co/docs/transformers/training)
+* [Summary of the tasks](https://huggingface.co/docs/transformers/task_summary)
 
 # Refrences 
 * https://www.youtube.com/playlist?list=PLZoTAELRMXVOTsz2jZl2Oq3ntWPoKRKwv
