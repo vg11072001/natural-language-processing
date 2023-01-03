@@ -1,13 +1,14 @@
 ## [Transformer](https://jalammar.github.io/illustrated-transformer/) :huggingface.co/docs/transformers/
 ![image](https://user-images.githubusercontent.com/67424390/210357353-2b203cab-73a3-4df6-9410-80291dbfa9c2.png)
-
+#### Step 1: Install Transformer.
+#### Step 2: Call the pretrained model.
+#### Step 3: Call the tokenizer of that particular pretrained model and encode the text in ex. seq2seq manner.
+#### Step 4: Convert these encoding into Dataset objects. (Different objects of dataset for tensorflow - tensors and pytorch)
+#### Step 5:  Translate and decode the elements in batch
 
 ## [BERT](https://jalammar.github.io/illustrated-bert/): 
 ![image](https://user-images.githubusercontent.com/67424390/210302799-ca5a509a-c473-43ee-b8a3-cd8fa585166e.png)
-#### Step 1: Install Transformer.
-#### Step 2: Call the pretrained model.
-#### Step 3: Call the tokenizer of that particular pretrained model.
-#### Step 4: Convert these encoding into Dataset objects. (Different objects of dataset for tensorflow and pytorch)
+
 
 ### First
 
