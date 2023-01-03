@@ -1,3 +1,7 @@
+## [Transformer](https://jalammar.github.io/illustrated-transformer/)
+![image](https://user-images.githubusercontent.com/67424390/210357353-2b203cab-73a3-4df6-9410-80291dbfa9c2.png)
+
+
 ## [BERT](https://jalammar.github.io/illustrated-bert/)
 ![image](https://user-images.githubusercontent.com/67424390/210302799-ca5a509a-c473-43ee-b8a3-cd8fa585166e.png)
 #### Step 1: Install Transformer.
@@ -20,6 +24,6 @@
 * [Tutorials by Hugging face for fine tune, processing, etc](https://huggingface.co/docs/transformers/training)
 * [Summary of the tasks](https://huggingface.co/docs/transformers/task_summary)
 
-# Refrences 
+## Refrences 
 * https://www.youtube.com/playlist?list=PLZoTAELRMXVOTsz2jZl2Oq3ntWPoKRKwv
 * https://neptune.ai/blog/natural-language-processing-with-hugging-face-and-transformers
