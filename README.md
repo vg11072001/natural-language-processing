@@ -8,7 +8,8 @@
   * https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ
   * https://aman.ai/cs224n/
   * [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/)
-* Natural Language Processing Specialization on Coursera (offered by deeplearning.ai) 
+* Natural Language Processing Specialization on Coursera (offered by deeplearning.ai)
+*   https://github.com/amanjeetsahu/Natural-Language-Processing-Specialization 
   * https://aman.ai/coursera-nlp/
   * https://github.com/vg11072001/coursera-natural-language-processing-specialization
 * https://github.com/vg11072001/NLP-with-Python 
