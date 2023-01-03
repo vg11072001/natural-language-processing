@@ -1,8 +1,8 @@
-## [Transformer](https://jalammar.github.io/illustrated-transformer/)
+## [Transformer](https://jalammar.github.io/illustrated-transformer/) :huggingface.co/docs/transformers/
 ![image](https://user-images.githubusercontent.com/67424390/210357353-2b203cab-73a3-4df6-9410-80291dbfa9c2.png)
 
 
-## [BERT](https://jalammar.github.io/illustrated-bert/)
+## [BERT](https://jalammar.github.io/illustrated-bert/): 
 ![image](https://user-images.githubusercontent.com/67424390/210302799-ca5a509a-c473-43ee-b8a3-cd8fa585166e.png)
 #### Step 1: Install Transformer.
 #### Step 2: Call the pretrained model.
