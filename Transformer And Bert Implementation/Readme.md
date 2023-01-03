@@ -3,7 +3,7 @@
 #### Step 1: Install Transformer.
 #### Step 2: Call the pretrained model.
 #### Step 3: Call the tokenizer of that particular pretrained model.
-#### Step 4: Convert these encoding into Dataset objects.
+#### Step 4: Convert these encoding into Dataset objects. (Diiferent objects of dataset for tensorflow and pytorch)
 
 ### First
 
