@@ -18,3 +18,7 @@
 ### Third
 * [🤗 Transformers Notebooks](https://huggingface.co/docs/transformers/main/en/notebooks)
 * [Tutorials by Hugging face for fine tune, processing, etc](https://huggingface.co/docs/transformers/training)
+
+# Refrences 
+* https://www.youtube.com/playlist?list=PLZoTAELRMXVOTsz2jZl2Oq3ntWPoKRKwv
+* https://neptune.ai/blog/natural-language-processing-with-hugging-face-and-transformers
