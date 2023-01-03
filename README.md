@@ -1,10 +1,9 @@
 # Natural Language Processing
-* [Live NLP Playlist by KrishNaik](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn)
 
 
 ### Resources 
-* [Stanford CS224N: NLP with Deep Learning | Winter 2021](https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ)
 * CS224n: Natural Language Processing with Deep Learning
+  * https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ
   * https://aman.ai/cs224n/
 * Natural Language Processing Specialization on Coursera (offered by deeplearning.ai) 
   * https://aman.ai/coursera-nlp/
