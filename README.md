@@ -13,7 +13,7 @@
 * Codes in NLP, Deep Learning, Reinforcement Learning and Artificial Intelligence: https://github.com/RubensZimbres/Repo-2017/
 * [Awesome Deep Learning for Natural Language Processing (NLP)](https://github.com/brianspiering/awesome-dl4nlp#table-of-contents)
 * https://course.fast.ai/Lessons/lesson4.html
-* https://neptune.ai/blog/natural-language-processing-with-hugging-face-and-transformers
+
 
 ![image](https://user-images.githubusercontent.com/67424390/209301541-3866b696-3aaf-498b-b0e9-304615dacfa0.png)
 
