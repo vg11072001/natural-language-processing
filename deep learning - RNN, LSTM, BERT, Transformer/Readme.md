@@ -1,3 +1,4 @@
+## [Live NLP Playlist by KrishNaik from 6-10](https://youtube.com/playlist?list=PLZoTAELRMXVNNrHSKv36Lr3_156yCo6Nn)
 ## LSTM 
 * Day 7 ending part
 * [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
