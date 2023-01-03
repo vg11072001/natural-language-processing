@@ -3,7 +3,7 @@
 #### Step 1: Install Transformer.
 #### Step 2: Call the pretrained model.
 #### Step 3: Call the tokenizer of that particular pretrained model.
-#### Step 4: Convert these encoding into Dataset objects. (Diiferent objects of dataset for tensorflow and pytorch)
+#### Step 4: Convert these encoding into Dataset objects. (Different objects of dataset for tensorflow and pytorch)
 
 ### First
 
@@ -13,3 +13,8 @@
 * [NLP: Implementing BERT and Transformers from Scratch](https://www.youtube.com/watch?v=EPa98fyxZ-s)
   * [Bert](https://github.com/msaroufim/RLnotes/blob/master/bert.md)
   * [Transformer](https://github.com/msaroufim/RLnotes/blob/master/transformer.md)
+
+
+### Third
+* [🤗 Transformers Notebooks](https://huggingface.co/docs/transformers/main/en/notebooks)
+* [Tutorials by Hugging face for fine tune, processing, etc](https://huggingface.co/docs/transformers/training)
