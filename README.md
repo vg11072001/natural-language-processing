@@ -5,6 +5,7 @@
 * CS224n: Natural Language Processing with Deep Learning
   * https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ
   * https://aman.ai/cs224n/
+  * [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/)
 * Natural Language Processing Specialization on Coursera (offered by deeplearning.ai) 
   * https://aman.ai/coursera-nlp/
   * https://github.com/vg11072001/coursera-natural-language-processing-specialization
