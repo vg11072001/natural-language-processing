@@ -1,5 +1,4 @@
-# Natural Language Processing
-
+# Natural Language Processing /github.com/graykode/nlp-tutorial
 
 ### Resources 
 * CS224n: Natural Language Processing with Deep Learning
