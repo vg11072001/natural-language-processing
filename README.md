@@ -1,8 +1,5 @@
 # natural-language-processing
 
-## Useful
-* [Illustrated Transformer](https://jalammar.github.io/illustrated-transformer/)
-* [Illustrated bert](https://jalammar.github.io/illustrated-bert/)
 
 ### Resources 
 * [Stanford CS224N: NLP with Deep Learning | Winter 2021](https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ)
