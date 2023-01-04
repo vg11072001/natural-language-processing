@@ -7,7 +7,7 @@
 #### Step 5:  Translate and decode the elements in batch
 
 ## [BERT](https://jalammar.github.io/illustrated-bert/): 
-![image](https://user-images.githubusercontent.com/67424390/210302799-ca5a509a-c473-43ee-b8a3-cd8fa585166e.png)
+![image](https://user-images.githubusercontent.com/67424390/210527955-cf5f1405-1585-4a11-9f51-c2097da438bf.png)
 
 
 ### First
@@ -29,3 +29,4 @@
 * https://www.youtube.com/playlist?list=PLZoTAELRMXVOTsz2jZl2Oq3ntWPoKRKwv
 * https://neptune.ai/blog/natural-language-processing-with-hugging-face-and-transformers
 * https://neptune.ai/blog/hugging-face-pre-trained-models-find-the-best
+* https://www.youtube.com/watch?v=xI0HHN5XKDo
