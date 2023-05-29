@@ -6,6 +6,8 @@
 ### Resources 
 * CS224n: Natural Language Processing with Deep Learning
   * https://www.youtube.com/playlist?list=PLoROMvodv4rOSH4v6133s9LFPRHjEmbmJ
+  * https://youtube.com/playlist?list=PLoROMvodv4rOhcuXMZkNm7j3fVwBBY42z
+  * Material - http://web.stanford.edu/class/cs224n/index.html#schedule 
   * https://aman.ai/cs224n/
   * [Speech and Language Processing](https://web.stanford.edu/~jurafsky/slp3/)
 * Natural Language Processing Specialization on Coursera (offered by deeplearning.ai)
