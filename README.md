@@ -1,4 +1,6 @@
 # Natural Language Processing 
+[![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/e1ca118e-a247-4139-b530-0ac15432188f)](https://mm.tt/map/2792478423?t=1mrN2j2FB1)
+
 * github.com/graykode/nlp-tutorial
 * github.com/TrainingByPackt/Deep-Learning-for-Natural-Language-Processing
 
