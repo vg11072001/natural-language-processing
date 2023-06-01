@@ -36,3 +36,44 @@
 * https://huggingface.co/welcome
 * https://odsc.medium.com/12-most-popular-nlp-projects-of-2022-so-far-e11cd01e9a8
 * Reasearch papers - https://machinelearningmastery.com/applications-of-deep-learning-for-natural-language-processing/
+
+## Categories of NLP:
+
+* **Text Preprocessing**: Cleaning, tokenization, stemming, lemmatization, stop word removal, spell checking, etc.
+* **Text Representation**: Bag-of-words, TF-IDF, word embeddings (Word2Vec, GloVe), contextual embeddings (BERT, ELMO), etc.
+* **Syntax and Grammar**: Parsing, part-of-speech tagging, syntactic analysis, dependency parsing, constituency parsing, etc.
+* **Semantics**: Named entity recognition, semantic role labeling, word sense disambiguation, semantic similarity, etc.
+* **Text Classification**: Sentiment analysis, topic modeling, document categorization, spam detection, intent recognition, etc.
+* **Information Extraction**: Named entity extraction, relation extraction, event extraction, entity linking, etc.
+* **Machine Translation**: Neural machine translation, statistical machine translation, alignment models, sequence-to-sequence models, etc.
+* **Question Answering**: Document-based QA, knowledge-based QA, open-domain QA, reading comprehension, etc.
+* **Text Generation**: Language modeling, text summarization, dialogue systems, chatbots, text completion, etc.
+* **Text-to-Speech and Speech-to-Text**: Automatic speech recognition (ASR), text-to-speech synthesis (TTS), voice assistants, etc.
+* **Text Mining and Analytics**: Topic extraction, sentiment analysis, trend detection, text clustering, opinion mining, etc.
+* **NLP Evaluation Metrics**: Precision, recall, F1-score, accuracy, BLEU score, ROUGE score, perplexity, etc.
+
+## NLP application involves several steps
+
+* **Define the Problem**: Clearly define the objective of your NLP application. Determine the specific task you want to perform, such as sentiment analysis, text classification, or named entity recognition.
+
+* **Data Collection:** Gather a dataset that is relevant to your problem. This dataset should be labeled or annotated with the target labels or annotations you want to predict.
+
+* **Data Preprocessing**: Clean and preprocess the dataset to prepare it for model training. This step may include removing unnecessary characters or symbols, handling missing data, tokenizing text, removing stop words, and performing other text normalization techniques.
+
+* **Data Exploration and Analysis:** Perform exploratory data analysis (EDA) to gain insights into the dataset. Visualize the data, analyze its statistical properties, and understand the distribution of different classes or labels.
+
+* **Feature Engineering:** Extract relevant features from the text data to represent it in a format suitable for machine learning algorithms. This may involve techniques such as bag-of-words, TF-IDF, word embeddings, or contextual embeddings.
+
+* **Model Selection:** Choose an appropriate machine learning or deep learning model for your task. Consider the nature of your problem, the size of your dataset, and the available computational resources. Common models used in NLP include logistic regression, support vector machines (SVM), recurrent neural networks (RNN), and transformer models.
+
+* **Model Training:** Split your dataset into training and validation sets. Train your chosen model on the training set using appropriate algorithms and optimization techniques. Tune hyperparameters to improve model performance. Monitor the training process to avoid overfitting.
+
+* **Model Evaluation:** Evaluate the trained model using appropriate evaluation metrics such as accuracy, precision, recall, F1-score, or area under the ROC curve. Assess its performance on the validation set to understand its generalization capabilities.
+
+* **Model Fine-tuning:** If the performance of the model is not satisfactory, consider refining the model architecture, adjusting hyperparameters, or applying techniques such as regularization to improve performance.
+
+* **Model Testing:** Once you are satisfied with the model's performance, evaluate it on a separate, unseen test dataset to assess its real-world performance. Ensure that the test dataset is representative of the data your model will encounter in production.
+
+* **Deployment:** Deploy the trained model into a production environment. This may involve integrating the model into an application or creating an API to serve predictions. Ensure the necessary infrastructure and resources are in place to support the deployment.
+
+* **Monitoring and Maintenance:** Continuously monitor the performance of the deployed model and collect feedback from users. Regularly retrain or update the model as new data becomes available or the requirements change.
