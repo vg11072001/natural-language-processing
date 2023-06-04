@@ -1,3 +1,9 @@
+Different Types of Word Embeddings 
+1. Frequency-based Embedding - Count Vector, TF-IDF Vector
+2. Prediction-based Embedding - CBOW (Continuous Bag of words), Skip – Gram model
+
+Word Embedding Algorithms - word2vec, GloVe
+
 ## Bag of words and N gram Models
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/0aa66987-d585-4544-898e-2209b3f37077)
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/25b9ea54-a669-4036-b780-5a3c748ee0c5)
@@ -43,6 +49,43 @@
 ### pad_sequences
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/06415084-0b16-4b69-81b8-68a7368ca8d7)
 
+### Word2Vec -https://www.kaggle.com/code/danielbilitewski/word2vec-and-logistic-regression
+Skip-gram: works well with small amount of the training data, represents well even rare words or phrases.
+CBOW: several times faster to train than the skip-gram, slightly better accuracy for the frequent words.
+
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/ed41b2e9-365f-40bd-82d2-5b23a0ed217b)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/757d5ec6-9336-4cfd-b1f6-8771143eb840)
+
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/e20cce20-129d-4942-9e09-0dba2e2dbe9d)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/1eee9de1-f37d-486c-9848-8b70bc70bf20)
+
+
+1. CBOW (Continuous Bag of words)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/8524315c-7bb1-4cdd-888e-6ae67e3d9132)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/d059fe32-eca1-478f-82f2-bde6ffd5169f)
+http://www.claudiobellei.com/2018/01/07/backprop-word2vec-python/
+
+2. Skip – Gram model
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/24c10955-649b-4846-8ed5-2cc1f610fc94)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/7f05ae1f-b070-423f-a054-c4c85fb16b20) 
+http://www.claudiobellei.com/2018/01/07/backprop-word2vec-python/
+
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/31bdb803-72d7-45d2-accf-65253cf2637b)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/203a03f5-a0fd-441a-bcef-7d567b659d7c)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/a2e7a365-6122-401d-9efb-3d7a1306bc12)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/f07ede82-8bf9-4907-bd61-770734d737e5)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/adc56d6d-83ee-45ac-b918-fad8073d2da4)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/061ff9f6-124f-4b69-b4e2-7ab4eb0f3aea)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/6318e081-12b1-4deb-b85b-1a2612f01455)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/a13e9b68-6939-4f29-86e3-36e4f605a281)
+
+### GloVe(Global Vectors for Word Representation) 
+https://github.com/vg11072001/NLP-with-Python/blob/master/Toxic%20Comments%20LSTM%20GloVe.ipynb
+
+### fastText
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/b5e9dbe4-c2e8-48b8-8d68-77d336a88506)
+
+
 ## Models
 ### SimpleRNN
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/c98d2551-2a79-48f5-846c-e7a31ec673ce)
@@ -71,3 +114,7 @@ Ref -
 https://github.com/codebasics/nlp-tutorials
 https://github.com/siddiquiamir/Python-Data-Preprocessing
 https://medium.com/@diegoglozano/building-a-pipeline-for-nlp-b569d51db2d1
+https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
+https://towardsdatascience.com/deep-learning-pipeline-for-natural-language-processing-nlp-c6f4074897bb
+https://www.kdnuggets.com/2018/04/implementing-deep-learning-methods-feature-engineering-text-data-skip-gram.html
+https://www.analyticsvidhya.com/blog/2021/06/practical-guide-to-word-embedding-system/?utm_source=reading_list&utm_medium=https://www.analyticsvidhya.com/blog/2017/06/word-embeddings-count-word2veec/
