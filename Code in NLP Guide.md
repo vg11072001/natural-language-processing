@@ -18,6 +18,15 @@
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/b69965f0-54ba-42d2-a647-22b41ae07bc8)
 ![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/878a834c-1efb-4874-9c0a-5438c8fdb38b)
 
+## One hot encoding
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/eabd8652-6a60-4e62-ad19-695c1f17b465)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/dd02fd7a-1e2e-4a33-a1e1-c139fb73d394)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/07704ae8-8a94-4336-a39a-76898ae530d1)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/7372d91d-84c7-4fe0-8742-a591833d5919)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/4752a623-bffd-4ee0-aa7e-6c9558210fc8)
+![image](https://github.com/vg11072001/natural-language-processing/assets/67424390/d5506820-6fae-4485-94fc-574a3383daac)
+
+
 ## Named Entity Recognition (NER)
 
 
@@ -27,4 +36,7 @@
 
 
 
-Ref - https://github.com/codebasics/nlp-tutorials
+
+Ref - 
+https://github.com/codebasics/nlp-tutorials
+https://github.com/siddiquiamir/Python-Data-Preprocessing
