@@ -38,6 +38,24 @@
 * https://odsc.medium.com/12-most-popular-nlp-projects-of-2022-so-far-e11cd01e9a8
 * Reasearch papers - https://machinelearningmastery.com/applications-of-deep-learning-for-natural-language-processing/
 
+## Reading Materials
+
+- [Link](https://substack.com/@kartiksinghal/note/c-70239045)
+5 landmark papers in NLP that significantly moved the needle
+
+These are 5 of my favorite papers that brought a step function change in natural language understanding. Anyone looking to learn NLP should read these, or at least some articles about them:
+
+A unified architecture for natural language processing: deep neural networks with multitask learning (ronan.collobert.com/pub… ) : This paper was the first to show how a single neural network architecture could learn task-specific word embeddings and apply them to multiple NLP tasks, such as part-of-speech tagging, chunking, and named entity recognition. Before this, word embeddings existed mostly as a concept but weren’t widely used across multiple tasks.
+
+Efficient Estimation of Word Representations in Vector Space (ronan.collobert.com/pub…) : This paper introduced Word2Vec model, which efficiently learns word embeddings by utilizing continuous bag-of-words (CBOW) and skip-gram architectures to capture semantic relationships between words. Word2Vec was the first major model to be scalable and widely used in industrial applications. It sparked a wave of X2Vec models (e.g., Doc2Vec, Tweet2Vec, Graph2vec), where various types of data were transformed into vector representations, further expanding the application of embedding techniques.
+
+Attention is all you need (ronan.collobert.com/pub…) : Who could forget this paper? :)  It introduced the Transformer model, which eliminated the need for recurrence by relying entirely on self-attention mechanisms to model relationships between tokens in a sequence. This dramatically improved performance and efficiency in NLP tasks and laid the foundation for LLM models.
+
+BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding (ronan.collobert.com/pub…) : This introduced BERT, the first LLM model based on deep bidirectional Transformers, pre-trained on vast amounts of text and fine-tuned for various NLP tasks setting a new standard for transfer learning.
+
+Language Models are Few-Shot Learners (ronan.collobert.com/pub…) : This paper introduced GPT-3, the largest language model (at the time) capable of performing tasks with minimal fine-tuning or task-specific data. It demonstrated the power of few-shot learning and essentially began the shift away from the need for task-specific trained models.
+
+Of course, the list is much longer, and there are many other milestone papers in NLP. Which ones are your favorites? I'd love to hear your thoughts!
 ## Categories of NLP:
 
 * **Text Preprocessing**: Cleaning, tokenization, stemming, lemmatization, stop word removal, spell checking, etc.
